@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --primary: 187 100% 50%;
+    --primary-foreground: 224 71% 4%;
+    --card: 224 71% 7%;
+    --card-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+  }
+
+  body {
+    background-color: #030712;
+    color: #f8fafc;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
+
+/* Background Cyber Grid Overlay */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px rgba(37, 99, 235, 0.25);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+}
