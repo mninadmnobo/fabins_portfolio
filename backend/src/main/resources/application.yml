@@ -1,0 +1,90 @@
+# =============================================================================
+# FABINS API — base configuration
+#
+# These are the defaults for every environment. Profile-specific files override
+# them: application-dev.yml and application-prod.yml.
+#
+# Choose a profile with SPRING_PROFILES_ACTIVE=prod, or --spring.profiles.active=prod.
+# `dev` is the default (set below), so `./mvnw spring-boot:run` just works.
+#
+# PRECEDENCE (highest wins): environment variable > profile file > this file.
+# That is why every secret below is written as ${ENV_VAR:fallback} — the
+# fallback keeps local development frictionless, and the environment variable
+# takes over in production.
+# =============================================================================
+
+spring:
+  application:
+    name: fabins-api
+
+  profiles:
+    default: dev
+
+  jpa:
+    # Schema is owned by Flyway, never by Hibernate. `validate` makes the app
+    # refuse to start if the entities and the migrated schema disagree, which
+    # turns a whole class of runtime failure into a startup failure.
+    hibernate:
+      ddl-auto: validate
+    # Leave false. When true, Hibernate runs a query per lazy association and
+    # quietly turns one request into hundreds.
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    # Serialise Instant as ISO-8601 ("2026-07-27T18:30:00Z") rather than as an
+    # epoch number, so responses are readable and unambiguous about timezone.
+    serialization:
+      write-dates-as-timestamps: false
+    # Omit null fields from responses, keeping payloads small and letting a
+    # client distinguish "absent" from "present but null".
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    # Suppress the default Whitelabel error body. Every error response is
+    # produced by GlobalExceptionHandler as RFC 9457 problem+json instead.
+    whitelabel:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Only these are reachable. Never expose "*" — that publishes env vars,
+        # heap dumps, and bean definitions.
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    # Group endpoints by tag and sort alphabetically for a readable page.
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+# --- Application settings -----------------------------------------------------
+# Bound to ApiProperties. Adding a key here means adding a field there.
+fabins:
+  cors:
+    # Exact origins allowed to call the API from a browser. The Next.js dev
+    # server runs on 3000. Add the production site origin before going live.
+    allowed-origins:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+
+  admin:
+    username: ${FABINS_ADMIN_USERNAME:admin}
+    # Development-only default. The prod profile removes it so that a missing
+    # environment variable fails the boot rather than shipping a known password.
+    password: ${FABINS_ADMIN_PASSWORD:change-me-in-production}
+
+logging:
+  level:
+    com.fabins: INFO

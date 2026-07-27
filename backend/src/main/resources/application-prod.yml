@@ -1,0 +1,60 @@
+# =============================================================================
+# `prod` profile — production.
+#
+# Activate with SPRING_PROFILES_ACTIVE=prod.
+#
+# Every value here comes from the environment with NO fallback, on purpose: a
+# missing variable stops the application at startup instead of silently running
+# with a development default. A boot failure is a far better outcome than a
+# public deployment with the password "change-me-in-production".
+#
+# REQUIRED ENVIRONMENT VARIABLES
+#   DATABASE_URL             jdbc:postgresql://host:5432/fabins
+#   DATABASE_USERNAME
+#   DATABASE_PASSWORD
+#   FABINS_ADMIN_USERNAME
+#   FABINS_ADMIN_PASSWORD
+#   FABINS_ALLOWED_ORIGIN    https://fabins.yourdomain.com
+# =============================================================================
+
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # Connection pool size. More is not better: each connection consumes
+      # memory on the database server, and a pool larger than the database's
+      # own limit turns into connection errors under load.
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    # Never log SQL in production: it is slow and can print personal data.
+    show-sql: false
+
+fabins:
+  cors:
+    # Only the real site may call the API from a browser.
+    allowed-origins:
+      - ${FABINS_ALLOWED_ORIGIN}
+
+  admin:
+    username: ${FABINS_ADMIN_USERNAME}
+    password: ${FABINS_ADMIN_PASSWORD}
+
+springdoc:
+  # Interactive API docs are disabled in production — they advertise every
+  # endpoint and payload shape. Set to true temporarily if you need them, and
+  # remember the Swagger routes are permitAll in SecurityConfig.
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.fabins: INFO

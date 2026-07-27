@@ -1,164 +1,160 @@
-# FABINS — Product Portfolio
+# 🔬 FABINS — AI-Powered Fabric Defect Inspection System
 
-Single-page product site for **FABINS**, an AI-based automated fabric defect inspection system built by the Saturn Textiles Limited R&D department.
+<p align="center">
+  <img src="frontend/public/fabins-logo-light-mode.png" alt="FABINS Logo" width="120" />
+</p>
 
-The site explains the product to mill owners: why manual inspection at the frame fails, why FABINS retrofits existing machines instead of replacing them, how the inspection pipeline works, how defects are scored under ASTM D5430, and how to request a deployment.
+<p align="center">
+  <strong>An AI-Powered Optical Inspection System for Textile Manufacturing & Export Mills</strong><br />
+  Developed by <strong>Saturn Textiles Limited — Research & Development Department</strong>
+</p>
 
----
-
-## Quick start
-
-```bash
-pnpm install     # or: npm install
-pnpm dev         # or: npm run dev
-```
-
-Open <http://localhost:3000>.
-
-| Command | What it does |
-| --- | --- |
-| `pnpm dev` | Development server with hot reload |
-| `pnpm build` | Production build — run this before pushing |
-| `pnpm start` | Serve the production build locally |
-| `pnpm type-check` | TypeScript check with no build output |
+<p align="center">
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Next.js-16.2.6-black?style=for-the-badge&logo=next.js" alt="Next.js 16" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Spring_Boot-3.4.2-brightgreen?style=for-the-badge&logo=spring" alt="Spring Boot 3" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk" alt="Java 21" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript" alt="TypeScript" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Tailwind_CSS-v4.3-38bdf8?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS v4" /></a>
+</p>
 
 ---
 
-## Stack
+## 📌 About FABINS
 
-| | |
-| --- | --- |
-| Framework | Next.js 16 (App Router) |
-| UI | React 19 |
-| Styling | Tailwind CSS v4 |
-| Animation | Framer Motion |
-| Icons | Lucide React |
-| Language | TypeScript (strict) |
+**FABINS** (*Fabric Inspection Automation*) is an end-to-end industrial machine-vision system built to replace error-prone manual fabric grading in textile export mills.
 
-The site is **static and light-mode only**. There is no backend yet — see [Connecting the backend](#connecting-the-backend).
+Instead of importing expensive foreign inspection machines that require replacing factory infrastructure, FABINS **retrofits onto the inspection frames mills already own**. It captures high-speed moving fabric via line-scan optical sensors, detects sub-millimeter defects in real-time, sizes them in millimeters, and automatically generates ASTM D5430 Four-Point quality inspection reports without human intervention.
 
 ---
 
-## Project structure
+## 🏛️ System Architecture
+
+This repository is structured as a clean **Full-Stack Monorepo** comprising a high-performance Next.js 16 web application and a production-grade Spring Boot 3 REST API backend.
 
 ```text
-app/
-  globals.css     Design tokens + shared classes. Read the header comment first.
-  layout.tsx      Root layout, page metadata, theming decision
-  page.tsx        The page: which sections render, in what order
-
-components/
-  layout/         The frame around the content
-    PageShell     Navbar + main + Footer + ambient background
-    Navbar        Floating pill header, scroll-spy, mobile menu
-    Footer        Brand, navigation, innovator list
-  sections/       One file per section of the page, named for its section
-  ui/             Pieces used by more than one section
-    SectionHeader     The eyebrow + heading + description block
-    FabinsLogo        Brand mark
-    InnovatorDetails  Profile modal
-
-lib/
-  data/           ALL CONTENT LIVES HERE — see below
-    site.ts             Navigation (shared by navbar and footer)
-    fabins-system.ts    Every product claim, spec, and grading rule
-    innovators.ts       Team members, bios, links
-  api/
-    contact.ts    The one boundary between the UI and the future backend
-  animations.ts   Shared Framer Motion entrance presets
-  scroll.ts       Smooth scrolling + scroll-spy, and the header offset
-  utils.ts        `cn()` class merging
-
-public/           Images, served from the site root (`/fabins-logo.png`)
-```
-
-Every file opens with a comment explaining what it is, what reads it, and what to change to alter its behaviour. **Start there rather than here** — this README covers the shape of things; the files cover the details.
-
----
-
-## How to make common changes
-
-### Change wording on the page
-
-Almost all copy is in `lib/data/`, not in components:
-
-| To change | Edit |
-| --- | --- |
-| Navigation links | `lib/data/site.ts` |
-| Problem cards, comparison table, pipeline steps, hardware specs, defect and grading content | `lib/data/fabins-system.ts` |
-| Team members, bios, profile links | `lib/data/innovators.ts` |
-
-The exceptions are deliberate and documented in place: the hero headline, the marquee strip, and the footer blurb are one-offs written inline in their own components, because moving six strings into a data file that only one component reads adds indirection without buying anything.
-
-### Add a section to the page
-
-1. Create `components/sections/YourSection.tsx`.
-2. Give its root `<section>` an `id`.
-3. Render it in `app/page.tsx` — that file's order **is** the page order.
-4. Add a matching entry to `NAV_LINKS` in `lib/data/site.ts`.
-
-The navbar link, footer link, and scroll-spy highlight all follow from step 4.
-
-### Change a colour
-
-Edit the token in the `:root` block at the top of `app/globals.css`. Nothing hardcodes a hex value, so one edit re-skins the whole site. Adding a *new* token also requires registering it in the `@theme inline` block below it — that is what generates the Tailwind utility class.
-
-### Add a section heading
-
-Use `SectionHeader`; do not hand-write the eyebrow/heading/description markup. It keeps the entrance animation timing consistent across every section.
-
-```tsx
-<SectionHeader
-  eyebrow="The problem"
-  title={<>THE HUMAN LIMIT AT<br />THE INSPECTION FRAME</>}
-  description="Quality control at the frame is still one inspector…"
-/>
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │                             WEB CLIENT (BROWSER)                            │
+ │  Next.js 16 App Router · React 19 · Framer Motion · Tailwind CSS v4          │
+ └──────────────────────────────────────┬──────────────────────────────────────┘
+                                        │
+                                        │ HTTP REST / JSON
+                                        ▼
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │                         SPRING BOOT 3 REST BACKEND                          │
+ │  Java 21 · Spring Security · Spring Data JPA · MapStruct · RFC 9457 Errors  │
+ └──────────────────────────────────────┬──────────────────────────────────────┘
+                                        │
+                                        │ JDBC SQL
+                                        ▼
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │                           PERSISTENCE LAYER (DATABASE)                      │
+ │  H2 In-Memory (Dev Profile) / PostgreSQL 16 (Production Profile)            │
+ └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Conventions
+## 📂 Repository Directory Layout
 
-**Content and presentation are kept apart.** Files in `lib/data/` hold plain strings and numbers — no Tailwind classes, no icon components, no JSX. A card's colour is expressed as a semantic tone (`'amber'`), and the section maps that to classes. This is what lets the content move behind an API or a CMS later without rewriting the components.
-
-**Lookups are keyed by id, never by array position.** Icons and per-item styling are resolved through a `Record<UnionType, …>` map. This is not just tidiness: it makes the map exhaustive, so adding an entry to a data file fails the build until the matching icon or colour is supplied, instead of rendering a blank space. `PROBLEM_ICONS`, `PILLAR_ICONS`, and `TONE_CLASSES` all work this way.
-
-**Sections are self-contained.** Each owns its own `id`, padding, and background. `app/page.tsx` contains no layout logic beyond the order of the sections.
-
-**Magic numbers are named and cross-referenced.** The fixed-header offset appears in three places — `HEADER_OFFSET_PX` in `lib/scroll.ts`, `scroll-padding-top` in `globals.css`, and `pt-24` on `<main>` in `PageShell`. Each names the other two in a comment. If you change one, change all three.
-
----
-
-## Connecting the backend
-
-The contact form is fully wired and handles pending, success, and failure states. It calls one function:
-
-```ts
-// lib/api/contact.ts
-submitDeploymentRequest(request: DeploymentRequest): Promise<SubmitResult>
+```text
+fabins_portfolio/
+├── frontend/                 # Next.js 16 Single-Page Marketing & Product Web App
+│   ├── app/                  # App Router: layout, page, globals.css tokens
+│   ├── components/           # UI Primitives, Sections, Layout Shell
+│   ├── lib/                  # Data fixtures, Selectors (DAL), API boundary
+│   └── types/                # Strict domain model TypeScript interfaces
+│
+├── backend/                  # Spring Boot 3.4 REST API Service
+│   ├── src/main/java/        # Controllers, Services, Repositories, Entities, DTOs
+│   ├── src/main/resources/   # application.yml configuration & database schemas
+│   ├── pom.xml               # Maven dependencies & build configuration
+│   └── mvnw / mvnw.cmd       # Cross-platform Maven Wrappers
+│
+└── docs/                     # 📚 Central Documentation & Learning Guides
+    ├── FRONTEND_ARCHITECTURE_GUIDE.md  # Complete React/Next.js learning guide
+    ├── BACKEND_LEARNING_GUIDE.md       # Complete Spring Boot & JPA learning guide
+    └── SYSTEM_SPECIFICATION.md         # FABINS industrial optical specification
 ```
 
-That function is currently a stub that logs to the console and resolves successfully. **To go live, replace its body with a real `fetch` and change nothing else** — a commented sketch of the call is in the function. Keep the signature and the `SubmitResult` return type; `ContactSection` is already written against them.
+---
 
-`SubmitResult` is a discriminated union (`{ ok: true } | { ok: false; error }`) rather than a thrown exception, so the failure path cannot be forgotten — TypeScript will not let you read `.error` without checking `ok` first.
+## 🚀 Quick Start Guide
+
+### Prerequisites
+* **Node.js**: v20.0+ and `pnpm` (or `npm`)
+* **Java JDK**: Version 21
 
 ---
 
-## Known follow-ups
+### Step 1: Run the Spring Boot Backend (Terminal 1)
 
-Not defects, but worth doing before this is considered finished:
+```bash
+cd backend
+./mvnw spring-boot:run          # On Windows PowerShell: .\mvnw.cmd spring-boot:run
+```
 
-- **Images are unoptimised.** Every image uses a plain `<img>` tag, so nothing is resized, converted to WebP, or lazy-loaded. `rahin-photo.png` alone is 1.7 MB and `fabins-machine.png` is 750 KB — together the page ships roughly 3 MB of images. Migrating to `next/image` with explicit `width`/`height` would cut that substantially with no visual change. The `eslint-disable` comments marking each `<img>` point at this note.
-- **No linter.** `pnpm lint` currently just runs the TypeScript compiler. Adding `eslint-config-next` would catch the unused imports and index-keyed lookups that this codebase had accumulated.
-- **`public/` holds two unused logos.** `fabins-logo-dark-mode.png` and `fabins-logo.png` are not referenced anywhere; only `fabins-logo-light-mode.png` is used. They are kept for a future dark mode — delete them if that is not planned.
-- **The profile modal uses its own palette.** `InnovatorDetails` is styled in blue and slate rather than the site's teal design tokens. The values are collected in one `PALETTE` constant at the top of the file, so unifying it is a small change — but it *is* a visual change, so it is left as a decision rather than done silently.
-- **`next-themes` is inert.** The theme provider is wired up but pinned to light mode, so it currently does nothing. It is kept as the hook for adding dark mode; see the note in `app/layout.tsx`. Remove it and the dependency if dark mode is off the table.
+* **API Base URL**: `http://localhost:8080/api/v1`
+* **Interactive Swagger UI**: `http://localhost:8080/swagger-ui.html`
+* **H2 Database Console**: `http://localhost:8080/h2-console` *(JDBC: `jdbc:h2:mem:fabins`, User: `sa`, No Password)*
 
 ---
 
-## Team
+### Step 2: Run the Next.js Frontend (Terminal 2)
 
-- **Md. Rahinur Rahman** — Lead AI Systems Engineer · EEE, BUET
-- **Mohammad Ninad Mahmud Nobo** — Lead AI Software Engineer · CSE, BUET
+```bash
+cd frontend
+cp .env.example .env.local      # Points API requests at http://localhost:8080
+pnpm install
+pnpm dev
+```
 
-Saturn Textiles Limited, Research & Development · Dhaka, Bangladesh
+* Open **`http://localhost:3000`** in your web browser.
+
+---
+
+## 🛠️ Technology Stack & Layering
+
+| Tier | Component | Description |
+| :--- | :--- | :--- |
+| **Frontend UI** | Next.js 16 (App Router) | High-performance React 19 SSR/SSG rendering framework |
+| **Styling** | Tailwind CSS v4 | Utility-first CSS engine with custom cyber-grid design tokens |
+| **Animations** | Framer Motion | Fluid scroll entrance presets & interactive modal transitions |
+| **Backend API** | Spring Boot 3.4 | Production-grade Java 21 REST API framework |
+| **Security** | Spring Security 6 | CORS policy control, CSRF protection, and endpoint role isolation |
+| **Persistence** | Spring Data JPA | Automatic SQL mapping for H2 (in-memory) & PostgreSQL |
+| **Documentation** | OpenAPI 3.0 / Swagger | Automated interactive REST API documentation |
+
+---
+
+## 📚 Central Learning & Educational Documentation
+
+This repository was specifically built as a **flagship educational reference** for students and developers learning full-stack web and backend development:
+
+* 📖 **[Frontend Architecture Guide](docs/FRONTEND_ARCHITECTURE_GUIDE.md)**: Teaches clean 3-layer React architecture, state composition, data selectors, and custom design primitives.
+* ☕ **[Spring Boot Learning Guide](docs/BACKEND_LEARNING_GUIDE.md)**: Line-by-line explanation of Spring Boot annotations, Controller-Service-Repository patterns, DTO mapping, and RFC 9457 error handling.
+
+---
+
+## 🔌 API Endpoints Summary
+
+| Method | Endpoint Path | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/deployment-requests` | **Public** | Submit deployment assessment request from website form |
+| `GET` | `/api/v1/deployment-requests` | Admin | List deployment requests (paginated, filterable by status) |
+| `GET` | `/api/v1/deployment-requests/{id}` | Admin | Retrieve details of a specific deployment request |
+| `PATCH` | `/api/v1/deployment-requests/{id}/status` | Admin | Update request status (`PENDING` ➔ `APPROVED` / `REJECTED`) |
+
+---
+
+## 👥 Authors & Credits
+
+Developed by **Saturn Textiles Limited — Research & Development Department**:
+
+* **Md. Rahinur Rahman** — Lead AI Systems Engineer (*EEE, BUET Graduate*)
+* **Mohammad Ninad Mahmud Nobo** — Lead AI Software Engineer (*CSE, BUET Graduate*)
+
+---
+
+<p align="center">
+  <sub>Built with precision for the Ready-Made Garment (RMG) export industry of Bangladesh.</sub>
+</p>
