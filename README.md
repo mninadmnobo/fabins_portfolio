@@ -1,10 +1,6 @@
 # 🔬 FABINS — AI-Powered Fabric Defect Inspection System
 
 <p align="center">
-  <img src="frontend/public/fabins-logo-light-mode.png" alt="FABINS Logo" width="120" />
-</p>
-
-<p align="center">
   <strong>An AI-Powered Optical Inspection System for Textile Manufacturing & Export Mills</strong><br />
   Developed by <strong>Saturn Textiles Limited — Research & Development Department</strong>
 </p>
