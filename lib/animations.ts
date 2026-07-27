@@ -2,8 +2,8 @@ import type { Transition, Variants } from 'framer-motion'
 
 const EASE_OUT: Transition['ease'] = 'easeOut'
 
-/** Standard viewport trigger: animate every time it enters the view. */
-export const defaultViewport = { once: false, margin: '-80px' } as const
+/** Standard viewport trigger: reveal once, then stay put. */
+export const defaultViewport = { once: true, amount: 0.15 } as const
 
 export function staggerContainer(staggerChildren = 0.1, delayChildren = 0.2): Variants {
   return {

@@ -1,76 +1,56 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Cpu, Menu, X, PlayCircle, FileText, Sparkles } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { FabinsLogo } from '@/components/ui/FabinsLogo'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+
+const NAV_LINKS = [
+  { name: 'Home', id: 'home' },
+  { name: 'About', id: 'about' },
+  { name: 'System', id: 'system' },
+  { name: 'Team', id: 'team' },
+]
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const navLinks = [
-    { name: 'Home', href: '#home', id: 'home' },
-    { name: 'Why FABINS', href: '#why-fabins', id: 'why-fabins' },
-    { name: 'Architecture', href: '#pipeline', id: 'pipeline' },
-    { name: 'Hardware', href: '#hardware', id: 'hardware' },
-    { name: 'Demonstration', href: '#demonstration', id: 'demonstration' },
-    { name: 'Roadmap', href: '#roadmap', id: 'roadmap' },
-    { name: 'Team', href: '#team', id: 'team' },
-  ]
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault()
+  const scrollTo = (targetId: string) => {
     setMobileMenuOpen(false)
 
     if (targetId === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
-      if (window.location.hash) {
-        window.history.replaceState(null, '', window.location.pathname)
-      }
-    } else {
-      const element = document.getElementById(targetId)
-      if (element) {
-        const topOffset = element.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({ top: topOffset, behavior: 'smooth' })
-        window.history.replaceState(null, '', `#${targetId}`)
-      }
+      return
+    }
+    const el = document.getElementById(targetId)
+    if (el) {
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 96,
+        behavior: 'smooth',
+      })
     }
   }
 
   useEffect(() => {
+    const trackedIds = [...NAV_LINKS.map((l) => l.id), 'contact']
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+      setIsScrolled(window.scrollY > 16)
 
-      // Active Section Scroll Tracking (including contact section)
-      const scrollPosition = window.scrollY + 220
-      const trackedIds = ['home', 'why-fabins', 'pipeline', 'hardware', 'demonstration', 'roadmap', 'team', 'contact']
-      const sectionElements = trackedIds.map((id) => ({ id, el: document.getElementById(id) }))
-
-      let currentSection = 'home'
-      for (let i = sectionElements.length - 1; i >= 0; i--) {
-        const item = sectionElements[i]
-        if (item.el && item.el.offsetTop <= scrollPosition) {
-          currentSection = item.id
+      const probe = window.scrollY + 200
+      let current = 'home'
+      for (let i = trackedIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(trackedIds[i])
+        if (el && el.offsetTop <= probe) {
+          current = trackedIds[i]
           break
         }
       }
-
-      setActiveSection(currentSection)
-
-      // Dynamic URL Hash Synchronization
-      if (currentSection === 'home') {
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname)
-        }
-      } else {
-        const expectedHash = `#${currentSection}`
-        if (window.location.hash !== expectedHash) {
-          window.history.replaceState(null, '', expectedHash)
-        }
-      }
+      setActiveSection(current)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -79,124 +59,125 @@ export const Navbar = () => {
   }, [])
 
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
-          ? 'bg-[#030712]/92 backdrop-blur-xl border-b border-cyan-500/25 py-3 shadow-[0_4px_30px_rgba(0,240,255,0.12)]'
-          : 'bg-transparent py-5'
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-
-        {/* Brand Logo */}
-        <a href="/" onClick={(e) => handleNavClick(e, 'home')} className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-700 flex items-center justify-center p-0.5 shadow-[0_0_18px_rgba(0,240,255,0.45)] group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#030712] rounded-[10px] flex items-center justify-center">
-              <Cpu className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" strokeWidth={2} />
-            </div>
-          </div>
-          <div>
-            <span className="text-xl font-extrabold tracking-wider text-white font-mono flex items-center">
-              FAB<span className="text-cyan-400">INS</span>
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
+      <div
+        className={cn(
+          'mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-full border backdrop-blur-xl transition-all duration-300',
+          'px-3 py-2 sm:px-4',
+          'hover:-translate-y-1 hover:border-accent/50 hover:bg-panel/90 hover:shadow-[0_20px_50px_-16px_rgba(8,145,178,0.55)]',
+          isScrolled
+            ? 'border-line bg-panel/85 shadow-[0_12px_44px_-26px_rgba(8,145,178,0.75)]'
+            : 'border-line/60 bg-panel/45'
+        )}
+      >
+        {/* Brand */}
+        <a
+          href="#home"
+          onClick={(e) => {
+            e.preventDefault()
+            scrollTo('home')
+          }}
+          className="group flex shrink-0 items-center gap-2 rounded-full py-1 pl-1 pr-3 transition-all duration-200 hover:-translate-y-0.5 hover:bg-panel-2"
+        >
+          <FabinsLogo className="h-11 w-11 shrink-0 sm:h-12 sm:w-12" />
+          <span className="flex flex-col justify-center leading-none">
+            <span className="block text-[17px] font-extrabold tracking-[-0.02em]">
+              FAB<span className="text-accent">INS</span>
             </span>
-            <span className="block text-[10px] text-cyan-400/90 uppercase font-mono tracking-widest leading-none mt-0.5">
+            <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-ink-soft">
               Fabric Inspection Automation
             </span>
-          </div>
+          </span>
         </a>
 
-        {/* Floating Active Pill Navigation */}
-        <nav className="hidden lg:flex items-center gap-1.5 bg-[#080d1a]/90 p-1.5 rounded-full border border-cyan-500/30 backdrop-blur-xl shadow-[0_0_25px_rgba(0,240,255,0.1)] relative">
-          {navLinks.map((link) => {
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-1 lg:flex">
+          {NAV_LINKS.map((link) => {
             const isActive = activeSection === link.id
             return (
               <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.id)}
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollTo(link.id)
+                }}
                 className={cn(
-                  "relative px-4 py-2 text-xs font-semibold font-mono rounded-full transition-all duration-300 flex items-center gap-1.5 select-none",
-                  isActive
-                    ? "text-white font-bold"
-                    : "text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                  'relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5',
+                  isActive ? 'text-[var(--btn-ink)]' : 'text-ink-muted hover:bg-accent-quiet hover:text-accent'
                 )}
               >
-                {/* Floating Motion Active Pill */}
                 {isActive && (
-                  <motion.div
-                    layoutId="navbar-active-pill"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/25 via-blue-600/30 to-cyan-500/25 border border-cyan-400/60 shadow-[0_0_20px_rgba(0,240,255,0.35)]"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[var(--btn-from)] to-[var(--btn-to)] shadow-[0_8px_25px_-8px_var(--btn-from)]"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
-
-                {/* Glowing Pulse Indicator */}
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff] animate-pulse relative z-10" />
-                )}
-
                 <span className="relative z-10">{link.name}</span>
               </a>
             )
           })}
         </nav>
 
-        {/* Right Action Buttons */}
-        <div className="hidden sm:flex items-center gap-3">
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           <a
             href="#contact"
-            onClick={(e) => handleNavClick(e, 'contact')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold font-mono text-[#030712] bg-gradient-to-r from-cyan-400 via-cyan-300 to-blue-500 hover:from-cyan-300 hover:to-blue-400 transition-all shadow-[0_0_20px_rgba(0,240,255,0.35)] hover:scale-105 active:scale-95 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault()
+              scrollTo('contact')
+            }}
+            className="btn btn-primary hidden !px-5 !py-2.5 text-[13px] sm:inline-flex"
           >
-            <PlayCircle className="w-3.5 h-3.5 text-[#030712]" />
-            Deploy FABINS
+            Let's Connect
           </a>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-panel text-ink-muted transition-colors hover:border-line-strong hover:text-accent lg:hidden"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-
-        {/* Mobile Hamburger Menu Toggle */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2.5 rounded-xl bg-slate-900/90 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 transition-colors"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#030712]/98 border-b border-cyan-500/30 px-6 py-6 space-y-3 backdrop-blur-2xl animate-fadeIn shadow-[0_10px_40px_rgba(0,240,255,0.15)]">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.id
-            return (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.id)}
-                className={cn(
-                  "flex items-center justify-between text-sm font-semibold font-mono py-2.5 px-4 rounded-xl transition-all border",
-                  isActive
-                    ? "text-cyan-300 bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_15px_rgba(0,240,255,0.2)]"
-                    : "text-slate-300 border-transparent hover:bg-slate-900 hover:text-cyan-400"
-                )}
-              >
-                <span>{link.name}</span>
-                {isActive && <Sparkles className="w-4 h-4 text-cyan-400" />}
-              </a>
-            )
-          })}
-          <div className="pt-4 flex flex-col gap-3">
+        <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-line bg-panel/95 p-3 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl lg:hidden">
+          {NAV_LINKS.map((link) => (
             <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, 'contact')}
-              className="w-full text-center py-3.5 rounded-xl text-xs font-bold font-mono text-[#030712] bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_20px_rgba(0,240,255,0.3)]"
+              key={link.id}
+              href={`#${link.id}`}
+              onClick={(e) => {
+                e.preventDefault()
+                scrollTo(link.id)
+              }}
+              className={cn(
+                'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                activeSection === link.id
+                  ? 'bg-gradient-to-r from-[var(--btn-from)] to-[var(--btn-to)] text-[var(--btn-ink)] shadow-[0_8px_25px_-8px_var(--btn-from)]'
+                  : 'text-ink-muted hover:bg-panel-2 hover:text-ink'
+              )}
             >
-              Deploy FABINS
+              {link.name}
             </a>
-          </div>
+          ))}
+          <a
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault()
+              scrollTo('contact')
+            }}
+            className="btn btn-primary mt-2 w-full"
+          >
+            Let's Connect
+          </a>
         </div>
       )}
     </header>
   )
 }
-

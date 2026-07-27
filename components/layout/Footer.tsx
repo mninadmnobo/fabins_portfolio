@@ -1,158 +1,118 @@
 'use client'
 
-import React from 'react'
-import { Cpu, ShieldCheck, ChevronRight, Activity, MapPin } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
+import { FabinsLogo } from '@/components/ui/FabinsLogo'
+
+const NAV = [
+  { name: 'About', id: 'about' },
+  { name: 'System', id: 'system' },
+  { name: 'Team', id: 'team' },
+  { name: 'Deploy FABINS', id: 'contact' },
+]
+
+const TEAM = [
+  { name: 'Md Rahinur Rahman', role: 'Lead AI Systems Engineer · EEE, BUET' },
+  { name: 'Mohammad Ninad Mahmud Nobo', role: 'Lead AI Software Engineer · CSE, BUET' },
+]
 
 export const Footer = () => {
-  const scrollToTarget = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault()
     if (targetId === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    } else {
-      const element = document.getElementById(targetId)
-      if (element) {
-        const topOffset = element.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({ top: topOffset, behavior: 'smooth' })
-      }
+      return
     }
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname)
+    const el = document.getElementById(targetId)
+    if (el) {
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 96,
+        behavior: 'smooth',
+      })
     }
   }
 
   return (
-    <footer className="bg-[#02050b] border-t border-cyan-500/25 text-slate-400 py-16 relative overflow-hidden">
-      {/* Ambient Cyber Backdrop Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12 mb-14">
-          
-          {/* Brand & R&D Badge Column */}
-          <div className="md:col-span-2 space-y-5">
-            <a href="/" onClick={(e) => scrollToTarget(e, 'home')} className="flex items-center gap-3.5 group w-fit">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-700 p-0.5 shadow-[0_0_20px_rgba(0,240,255,0.45)] group-hover:scale-105 transition-transform duration-300">
-                <div className="w-full h-full bg-[#030712] rounded-[10px] flex items-center justify-center">
-                  <Cpu className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
-                </div>
-              </div>
-              <div>
-                <span className="text-2xl font-extrabold text-white font-mono tracking-wider flex items-center">
-                  FAB<span className="text-cyan-400">INS</span>
+    <footer className="border-t border-line bg-canvas-alt/60">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+          {/* Brand */}
+          <div className="md:col-span-5">
+            <a
+              href="#home"
+              onClick={(e) => scrollTo(e, 'home')}
+              className="inline-flex items-center gap-3 transition-opacity hover:opacity-80"
+            >
+              <FabinsLogo className="h-12 w-12" />
+              <span className="flex flex-col justify-center leading-none">
+                <span className="block text-xl font-extrabold tracking-[-0.02em]">
+                  FAB<span className="text-accent">INS</span>
                 </span>
-                <span className="block text-[10px] text-cyan-400/90 font-mono tracking-widest uppercase mt-0.5">
+                <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-ink-soft">
                   Fabric Inspection Automation
                 </span>
-              </div>
+              </span>
             </a>
 
-            <p className="text-xs leading-relaxed text-slate-300/90 max-w-md font-sans">
-              <strong className="text-white font-semibold">Fabric Inspection Automation (FABINS)</strong> — An AI-powered fabric defect detection platform automating inspection with a high-speed line-scan camera vision pipeline and Four-Point Scoring engine.
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-muted">
+              An AI-powered fabric defect detection platform — line-scan capture, millimetre
+              measurement and a Four-Point scoring engine, retrofitted onto existing mill frames.
             </p>
 
-            {/* R&D Institutional Badge */}
-            <div className="p-3.5 rounded-2xl bg-[#060c1c]/90 border border-cyan-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,240,255,0.1)] inline-flex items-center gap-3 max-w-md">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-4 h-4 text-cyan-400" />
-              </div>
-              <div className="text-xs font-mono">
-                <span className="block text-slate-300 font-semibold">Saturn Textiles Limited</span>
-                <span className="text-cyan-400 text-[11px] font-medium block">
-                  Department of Research and Development (R&D)
-                </span>
-              </div>
+            <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-3">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-accent" />
+              <span className="text-xs leading-tight">
+                <span className="block font-semibold">Saturn Textiles Limited</span>
+                <span className="block text-ink-soft">Research &amp; Development</span>
+              </span>
             </div>
           </div>
 
-          {/* System Architecture Links */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-5 font-mono flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff]" />
-              System Architecture
+          {/* Navigate */}
+          <div className="md:col-span-3">
+            <h4 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
+              Navigate
             </h4>
-            <ul className="space-y-3 text-xs font-mono">
-              {[
-                { name: 'Line-Scan Hardware Trigger', target: 'pipeline' },
-                { name: 'Hikrobot 8192px Sensor', target: 'hardware' },
-                { name: 'YOLOv8 AI Defect Engine', target: 'pipeline' },
-                { name: 'Four-Point Scoring Rules', target: 'demonstration' },
-                { name: 'Automated Report Generator', target: 'report-sim' },
-              ].map((item, idx) => (
-                <li key={idx}>
+            <ul className="mt-5 space-y-3 text-sm">
+              {NAV.map((item) => (
+                <li key={item.id}>
                   <a
-                    href={`#${item.target}`}
-                    onClick={(e) => scrollToTarget(e, item.target)}
-                    className="group inline-flex items-center gap-1.5 text-slate-400 hover:text-cyan-300 transition-colors"
+                    href={`#${item.id}`}
+                    onClick={(e) => scrollTo(e, item.id)}
+                    className="text-ink-muted transition-colors hover:text-accent"
                   >
-                    <ChevronRight className="w-3 h-3 text-cyan-500/60 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
-                    <span>{item.name}</span>
+                    {item.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Development Team */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-5 font-mono flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_#3b82f6]" />
-              Development Team
+          {/* Team */}
+          <div className="md:col-span-4">
+            <h4 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
+              Development team
             </h4>
-            <ul className="space-y-4 text-xs font-mono">
-              <li className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-cyan-500/30 transition-colors">
-                <a
-                  href="#team"
-                  onClick={(e) => scrollToTarget(e, 'team')}
-                  className="block group"
-                >
-                  <span className="block font-bold text-white group-hover:text-cyan-400 transition-colors">
-                    Md. Rahinur Rahman
-                  </span>
-                  <span className="text-cyan-400 text-[11px] block mt-0.5 font-medium">
-                    Lead AI Systems Engineer <span className="text-slate-400">(EEE, BUET)</span>
-                  </span>
-                </a>
-              </li>
-              <li className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-cyan-500/30 transition-colors">
-                <a
-                  href="#team"
-                  onClick={(e) => scrollToTarget(e, 'team')}
-                  className="block group"
-                >
-                  <span className="block font-bold text-white group-hover:text-cyan-400 transition-colors">
-                    Mohammad Ninad Mahmud Nobo
-                  </span>
-                  <span className="text-cyan-400 text-[11px] block mt-0.5 font-medium">
-                    Lead AI Software Engineer <span className="text-slate-400">(CSE, BUET)</span>
-                  </span>
-                </a>
-              </li>
+            <ul className="mt-5 space-y-4 text-sm">
+              {TEAM.map((person) => (
+                <li key={person.name}>
+                  <a href="#team" onClick={(e) => scrollTo(e, 'team')} className="group block">
+                    <span className="block font-medium transition-colors group-hover:text-accent">
+                      {person.name}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">{person.role}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        {/* Separator Line with Ambient Glow */}
-        <div className="relative h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent mb-8">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-cyan-400/20 border border-cyan-400 shadow-[0_0_10px_#00f0ff]" />
-        </div>
-
-        {/* Bottom Bar: Copyright & System Status */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-slate-400">
-          <p className="text-center sm:text-left">
-            © {new Date().getFullYear()} <span className="text-slate-200 font-semibold">FABINS R&D Team</span> • Saturn Textiles Limited. All rights reserved.
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 text-xs text-ink-soft sm:flex-row">
+          <p>© {new Date().getFullYear()} FABINS · Saturn Textiles Limited. All rights reserved.</p>
+          <p className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            Dhaka, Bangladesh
           </p>
-          
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px]">
-              <Activity className="w-3.5 h-3.5 animate-pulse" />
-              <span>System Status: Operational</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 text-slate-400 text-[11px]">
-              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Dhaka, Bangladesh</span>
-            </div>
-          </div>
         </div>
       </div>
     </footer>

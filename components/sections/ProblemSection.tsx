@@ -16,50 +16,40 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Cpu,
 }
 
-export const ProblemSection = () => {
-  return (
-    <section className="py-20 border-b border-cyan-500/20 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <motion.div {...fadeUpProps(0.1)} className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-bold font-mono text-cyan-400 uppercase tracking-widest px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30">
-            Industry Context & Challenges
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight uppercase">
-            Why This Matters for <span className="text-cyan-400">Bangladesh RMG</span>
-          </h2>
-          <p className="text-slate-400 text-sm leading-relaxed">
-            Fabric grading is still a manual, human-paced task — at exactly the moment global manufacturing is automating quality control.
-          </p>
-        </motion.div>
-
-        {/* 8 Grid Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FABINS_POC_DATA.industryProblems.map((item, idx) => {
-            const IconComponent = ICON_MAP[item.iconName] || Cpu
-            return (
-              <motion.div
-                key={item.id}
-                {...fadeUpProps(idx * 0.05)}
-                className="bg-[#090d16]/80 p-6 rounded-2xl border border-slate-800 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
-                    <IconComponent className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2 font-mono group-hover:text-cyan-400 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
+export const ProblemSection = () => (
+  <section className="py-24 sm:py-28">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mb-14 max-w-3xl">
+        <motion.span {...fadeUpProps(0.05)} className="eyebrow">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          The problem
+        </motion.span>
+        <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">
+          Fabric grading still runs
+          <br />
+          at human pace.
+        </motion.h2>
+        <motion.p {...fadeUpProps(0.16)} className="mt-6 leading-relaxed text-ink-muted">
+          Bangladesh RMG is a national export pillar, yet quality control at the frame is still one
+          inspector, one pair of eyes, one tally sheet — while competing manufacturing hubs have
+          already automated it.
+        </motion.p>
       </div>
-    </section>
-  )
-}
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {FABINS_POC_DATA.industryProblems.slice(0, 4).map((item, idx) => {
+          const Icon = ICON_MAP[item.iconName] || Cpu
+          return (
+            <motion.div key={item.id} {...fadeUpProps(idx * 0.07)} className="card card-hover">
+              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-panel-2 text-accent">
+                <Icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-base font-semibold tracking-tight">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.description}</p>
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+)

@@ -1,39 +1,39 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'FABINS Automation',
-  description: 'Official Product Portfolio for FABINS Automation — a working machine-vision system that detects, measures, classifies and grades fabric defects to the Four-Point Scoring System.',
-  keywords: [
-    'FABINS Automation',
-    'FABINS',
-    'Fabric Inspection Automation',
-    'AI Defect Detection',
-    'Four-Point System',
-    'Textile Machine Vision',
-    'Saturn Textiles Limited R&D',
-    'Hikrobot Line-Scan Camera',
-    'Bangladesh RMG Automation'
-  ],
+  title: 'FABINS — Fabric Inspection Automation',
+  description:
+    'AI-powered fabric defect detection: line-scan capture, millimetre measurement and automatic Four-Point inspection reports — a retrofit for the inspection frames mills already own.',
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/fabins-icon.png', type: 'image/png' }
+      { url: '/fabins-logo.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
-    shortcut: '/fabins-icon.png',
-    apple: '/fabins-icon.png'
-  }
+    shortcut: '/fabins-logo.png',
+    apple: '/fabins-logo.png',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f4f6fa' },
+    { media: '(prefers-color-scheme: dark)', color: '#05070d' },
+  ],
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className="antialiased bg-[#030712] text-slate-100 font-sans selection:bg-cyan-500 selection:text-black">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
