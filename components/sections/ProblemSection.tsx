@@ -25,9 +25,9 @@ export const ProblemSection = () => (
           The problem
         </motion.span>
         <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">
-          Fabric grading still runs
+          THE HUMAN LIMIT AT
           <br />
-          at human pace.
+          THE INSPECTION FRAME
         </motion.h2>
         <motion.p {...fadeUpProps(0.16)} className="mt-6 leading-relaxed text-ink-muted">
           Bangladesh RMG is a national export pillar, yet quality control at the frame is still one

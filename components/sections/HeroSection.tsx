@@ -32,7 +32,7 @@ export const HeroSection = () => (
               See how it works
             </a>
             <a href="#contact" className="btn btn-primary">
-              Let's Connect
+              Deploy FABINS
             </a>
           </motion.div>
 

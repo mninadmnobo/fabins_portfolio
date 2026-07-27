@@ -5,12 +5,12 @@ import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FabinsLogo } from '@/components/ui/FabinsLogo'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const NAV_LINKS = [
   { name: 'Home', id: 'home' },
   { name: 'About', id: 'about' },
   { name: 'System', id: 'system' },
+  { name: 'Standards', id: 'standards' },
   { name: 'Team', id: 'team' },
 ]
 
@@ -122,7 +122,6 @@ export const Navbar = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <a
             href="#contact"
             onClick={(e) => {

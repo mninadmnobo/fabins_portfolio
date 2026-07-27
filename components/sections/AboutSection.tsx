@@ -14,15 +14,15 @@ export const AboutSection = () => (
           <div className="lg:sticky lg:top-32">
             <motion.span {...fadeUpProps(0.05)} className="eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              About FABINS
+              About FAB<span className="text-accent">INS</span>
             </motion.span>
             <motion.h2
               {...fadeUpProps(0.1)}
               className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]"
             >
-              Retrofit,
+              RETROFIT,
               <br />
-              not replace.
+              NOT REPLACE.
             </motion.h2>
             <motion.p {...fadeUpProps(0.16)} className="mt-6 max-w-md leading-relaxed text-ink-muted">
               Imported inspection systems ask a mill to throw away its inspection machine. FABINS

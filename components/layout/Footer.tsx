@@ -6,6 +6,7 @@ import { FabinsLogo } from '@/components/ui/FabinsLogo'
 const NAV = [
   { name: 'About', id: 'about' },
   { name: 'System', id: 'system' },
+  { name: 'Standards', id: 'standards' },
   { name: 'Team', id: 'team' },
   { name: 'Deploy FABINS', id: 'contact' },
 ]

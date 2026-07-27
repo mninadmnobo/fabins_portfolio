@@ -1,10 +1,7 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ── Design tokens ──────────────────────────────────────────────
-   Every colour in the UI resolves through these variables, so light
-   and dark mode stay in sync without per-component overrides. */
+   Every colour in the UI resolves through these variables. */
 
 :root {
   --canvas: #f4f6fa;
@@ -32,34 +29,6 @@
 
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 30px -18px rgba(15, 23, 42, 0.35);
   --shadow-lift: 0 2px 6px rgba(15, 23, 42, 0.06), 0 26px 50px -24px rgba(8, 145, 178, 0.45);
-}
-
-.dark {
-  --canvas: #05070d;
-  --canvas-alt: #080c15;
-  --panel: #0b1018;
-  --panel-2: #101725;
-  --line: rgba(148, 163, 184, 0.14);
-  --line-strong: rgba(34, 211, 238, 0.32);
-
-  --ink: #eaf0f8;
-  --ink-muted: #9aabc2;
-  --ink-soft: #6b7b93;
-
-  --accent: #22d3ee;
-  --accent-bright: #67e8f9;
-  --accent-quiet: rgba(34, 211, 238, 0.1);
-
-  --btn-ink: #03121a;
-  --btn-from: #22d3ee;
-  --btn-to: #3b82f6;
-
-  --grid-line: rgba(34, 211, 238, 0.055);
-  --glow-a: rgba(34, 211, 238, 0.2);
-  --glow-b: rgba(37, 99, 235, 0.16);
-
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03), 0 14px 34px -20px rgba(0, 0, 0, 0.9);
-  --shadow-lift: 0 0 0 1px rgba(34, 211, 238, 0.14), 0 26px 60px -26px rgba(34, 211, 238, 0.4);
 }
 
 @theme inline {

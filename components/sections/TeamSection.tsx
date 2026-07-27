@@ -10,9 +10,9 @@ import { fadeUpProps } from '@/lib/animations'
 
 const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect width="24" height="24" rx="5" fill="#0A66C2"/>
-    <path d="M19 19H15.8202V13.8407C15.8202 12.5199 15.3408 11.6163 14.1565 11.6163C13.2505 11.6163 12.716 12.2217 12.4795 12.808C12.3929 13.0182 12.3708 13.3108 12.3708 13.6046V19H9.18972C9.18972 19 9.2323 10.3709 9.18972 9.46736H12.3708V10.8202C12.7937 10.1659 13.5517 9.2323 15.2492 9.2323C17.3392 9.2323 18.9189 10.5975 18.9189 13.5414V19H19Z" fill="white"/>
-    <path d="M5.53906 8.01633C6.65089 8.01633 7.34509 7.28308 7.32454 6.36875C7.30399 5.43317 6.65089 4.7207 5.56116 4.7207C4.47143 4.7207 3.75488 5.43317 3.75488 6.36875C3.75488 7.28308 4.45088 8.01633 5.53906 8.01633ZM3.94824 19H7.12933V9.46736H3.94824V19Z" fill="white"/>
+    <rect width="24" height="24" rx="5" fill="#0A66C2" />
+    <path d="M19 19H15.8202V13.8407C15.8202 12.5199 15.3408 11.6163 14.1565 11.6163C13.2505 11.6163 12.716 12.2217 12.4795 12.808C12.3929 13.0182 12.3708 13.3108 12.3708 13.6046V19H9.18972C9.18972 19 9.2323 10.3709 9.18972 9.46736H12.3708V10.8202C12.7937 10.1659 13.5517 9.2323 15.2492 9.2323C17.3392 9.2323 18.9189 10.5975 18.9189 13.5414V19H19Z" fill="white" />
+    <path d="M5.53906 8.01633C6.65089 8.01633 7.34509 7.28308 7.32454 6.36875C7.30399 5.43317 6.65089 4.7207 5.56116 4.7207C4.47143 4.7207 3.75488 5.43317 3.75488 6.36875C3.75488 7.28308 4.45088 8.01633 5.53906 8.01633ZM3.94824 19H7.12933V9.46736H3.94824V19Z" fill="white" />
   </svg>
 )
 
@@ -30,9 +30,11 @@ export const TeamSection = () => {
             </motion.span>
             <motion.h2
               {...fadeUpProps(0.1)}
-              className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]"
+              className="display mt-5 text-[clamp(1.4rem,2.6vw,2.15rem)]"
             >
-              Engineers, designers and researchers behind FABINS
+              INNOVATORS BEHIND
+              <br />
+              FAB<span className="text-accent">INS</span>
             </motion.h2>
           </div>
           <motion.p {...fadeUpProps(0.16)} className="max-w-md leading-relaxed text-ink-muted">

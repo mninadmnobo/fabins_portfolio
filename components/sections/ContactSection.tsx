@@ -11,6 +11,7 @@ export const ContactSection = () => {
     millName: '',
     contactName: '',
     email: '',
+    phone: '',
     message: '',
   })
 
@@ -37,12 +38,12 @@ export const ContactSection = () => {
               {...fadeUpProps(0.1)}
               className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]"
             >
-              Upgrade your
+              UPGRADE YOUR
               <br />
-              inspection floor.
+              INSPECTION
             </motion.h2>
             <motion.p {...fadeUpProps(0.16)} className="mt-6 max-w-md leading-relaxed text-ink-muted">
-              Tell us about your mill and we&apos;ll come back with a retrofit assessment for your
+              Tell us about your mill specs and we&apos;ll come back with a tailored retrofit assessment for your
               existing inspection frames.
             </motion.p>
 
@@ -80,10 +81,11 @@ export const ContactSection = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Contact Info */}
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <label className="block">
                       <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-                        Mill / factory
+                        Mill / Factory
                       </span>
                       <input
                         type="text"
@@ -97,7 +99,7 @@ export const ContactSection = () => {
 
                     <label className="block">
                       <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-                        Contact person
+                        Contact Person
                       </span>
                       <input
                         type="text"
@@ -110,26 +112,41 @@ export const ContactSection = () => {
                     </label>
                   </div>
 
-                  <label className="block">
-                    <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-                      Work email
-                    </span>
-                    <input
-                      type="email"
-                      required
-                      placeholder="gm@apextextiles.com"
-                      value={formData.email}
-                      onChange={update('email')}
-                      className="field"
-                    />
-                  </label>
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
+                        Work Email
+                      </span>
+                      <input
+                        type="email"
+                        required
+                        placeholder="gm@apextextiles.com"
+                        value={formData.email}
+                        onChange={update('email')}
+                        className="field"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
+                        Phone / WhatsApp
+                      </span>
+                      <input
+                        type="tel"
+                        placeholder="+880 1700-000000"
+                        value={formData.phone}
+                        onChange={update('phone')}
+                        className="field"
+                      />
+                    </label>
+                  </div>
 
                   <label className="block">
                     <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-                      What would you like to inspect?
+                      Inspection Requirements &amp; Fabric Specs
                     </span>
                     <textarea
-                      rows={4}
+                      rows={3}
                       placeholder="Fabric types, roll widths, daily volume, buyer quality standards…"
                       value={formData.message}
                       onChange={update('message')}

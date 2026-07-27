@@ -91,14 +91,13 @@ export const SystemSection = () => {
               The system
             </motion.span>
             <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">
-              One pass, capture
+              FROM ROLLING CLOTH
               <br />
-              to signed report.
+              TO INSTANT REPORT.
             </motion.h2>
           </div>
           <motion.p {...fadeUpProps(0.16)} className="max-w-md leading-relaxed text-ink-muted">
-            A rotary encoder triggers every image line from actual fabric travel, so measurements
-            hold their accuracy no matter how fast the roll runs.
+            Synchronized with real fabric motion to deliver millimeter-accurate defect detection at full production speed.
           </motion.p>
         </div>
 

@@ -8,19 +8,16 @@ export const metadata: Metadata = {
     'AI-powered fabric defect detection: line-scan capture, millimetre measurement and automatic Four-Point inspection reports — a retrofit for the inspection frames mills already own.',
   icons: {
     icon: [
-      { url: '/fabins-logo.png', type: 'image/png' },
+      { url: '/fabins-logo-light-mode.png', type: 'image/png' },
       { url: '/favicon.ico', sizes: 'any' },
     ],
-    shortcut: '/fabins-logo.png',
-    apple: '/fabins-logo.png',
+    shortcut: '/fabins-logo-light-mode.png',
+    apple: '/fabins-logo-light-mode.png',
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f4f6fa' },
-    { media: '(prefers-color-scheme: dark)', color: '#05070d' },
-  ],
+  themeColor: '#f4f6fa',
 }
 
 export default function RootLayout({
@@ -31,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
           {children}
         </ThemeProvider>
       </body>

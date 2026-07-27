@@ -19,13 +19,7 @@ export const FabinsLogo: React.FC<FabinsLogoProps> = ({
     <img
       src="/fabins-logo-light-mode.png"
       alt={alt}
-      className={`block object-contain dark:hidden ${className}`}
-    />
-    <img
-      src="/fabins-logo-dark-mode.png"
-      alt=""
-      aria-hidden="true"
-      className={`hidden object-contain dark:block ${className}`}
+      className={`block object-contain ${className}`}
     />
   </span>
 )
