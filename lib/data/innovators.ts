@@ -1,10 +1,10 @@
 /**
- * Team & leadership content for FABINS.
+ * Innovators & leadership content for FABINS.
  *
- * Single source of truth for team members displayed in DevelopmentTeamSection.
+ * Single source of truth for innovator members displayed in InnovatorsSection.
  */
 
-export interface TeamMember {
+export interface InnovatorMember {
   id: string
   name: string
   title: string
@@ -23,7 +23,8 @@ export interface TeamMember {
   }
 }
 
-export const fabinsTeamMembers: TeamMember[] = [
+
+export const fabinsInnovators: InnovatorMember[] = [
   {
     id: 'rahin',
     name: 'Md Rahinur Rahman',

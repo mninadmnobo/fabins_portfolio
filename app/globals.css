@@ -72,20 +72,24 @@
     width: 10px;
     height: 10px;
   }
+
   ::-webkit-scrollbar-track {
     background: var(--canvas-alt);
   }
+
   ::-webkit-scrollbar-thumb {
     background: var(--line-strong);
     border-radius: 999px;
     border: 2px solid var(--canvas-alt);
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background: var(--accent);
   }
 }
 
 @layer components {
+
   /* Faint engineering grid behind the page */
   .grid-bg {
     background-image:
@@ -99,16 +103,16 @@
     @apply font-extrabold leading-[0.95] tracking-[-0.035em];
   }
 
-  /* Small uppercase eyebrow label with a leading dot */
+  /* Uppercase eyebrow label with a leading dot */
   .eyebrow {
-    @apply inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase
-           tracking-[0.22em] text-accent;
+    @apply inline-flex items-center gap-2.5 font-mono text-sm sm:text-base font-bold uppercase tracking-[0.18em] text-accent;
   }
 
   .card {
     @apply rounded-3xl border border-line bg-panel p-7 transition-all duration-300;
     box-shadow: var(--shadow-card);
   }
+
   .card-hover:hover {
     border-color: var(--line-strong);
     box-shadow: var(--shadow-lift);
@@ -116,37 +120,52 @@
   }
 
   .chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5
-           font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted;
+    @apply inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted;
     background-color: var(--panel);
   }
 
   /* Pill buttons — signature control with floating hover effect */
   .btn {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full px-6 py-3.5
-           text-sm font-semibold transition-all duration-300 ease-out active:scale-[0.97];
+    @apply inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm font-semibold transition-all duration-300 ease-out active:scale-[0.97];
   }
+
   .btn:hover {
     transform: translateY(-4px) scale(1.02);
   }
-  .btn-primary,
-  .btn-secondary,
-  .btn-ghost {
+
+  .btn-primary {
     background-image: linear-gradient(100deg, var(--btn-from), var(--btn-to));
     color: var(--btn-ink);
     box-shadow: 0 10px 30px -12px var(--btn-from);
   }
-  .btn-primary:hover,
-  .btn-secondary:hover,
-  .btn-ghost:hover {
+
+  .btn-primary:hover {
     filter: brightness(1.12);
     box-shadow: 0 20px 45px -10px var(--btn-from), 0 0 30px -4px var(--btn-from);
   }
 
-  .field {
-    @apply w-full rounded-2xl border border-line bg-panel-2 px-4 py-3.5 text-sm text-ink
-           outline-none transition-colors placeholder:text-ink-soft;
+  .btn-secondary {
+    @apply border border-line bg-panel text-ink shadow-sm transition-all duration-300;
   }
+
+  .btn-secondary:hover {
+    @apply border-accent text-accent;
+    background-color: var(--accent-quiet);
+    box-shadow: 0 8px 20px -6px rgba(8, 145, 178, 0.2);
+  }
+
+  .btn-ghost {
+    @apply border border-transparent bg-transparent text-ink-muted;
+  }
+
+  .btn-ghost:hover {
+    @apply text-ink bg-panel-2;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-line bg-panel-2 px-4 py-3.5 text-sm text-ink outline-none transition-colors placeholder:text-ink-soft;
+  }
+
   .field:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-quiet);
@@ -159,10 +178,12 @@
 }
 
 @layer utilities {
+
   /* Infinite marquee strip */
   .marquee-track {
     animation: marquee 38s linear infinite;
   }
+
   .marquee:hover .marquee-track {
     animation-play-state: paused;
   }
@@ -171,6 +192,7 @@
     from {
       transform: translateX(0);
     }
+
     to {
       transform: translateX(-50%);
     }
@@ -180,6 +202,7 @@
     .marquee-track {
       animation: none;
     }
+
     html {
       scroll-behavior: auto;
     }

@@ -10,9 +10,14 @@ export const HeroSection = () => (
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
         {/* Copy */}
         <div className="lg:col-span-6">
+          <motion.span {...fadeUpProps(0.05)} className="eyebrow">
+            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
+            Future of Fabric Inspection
+          </motion.span>
+
           <motion.h1
             {...fadeUpProps(0.12)}
-            className="display mt-6 text-[clamp(2.6rem,6.2vw,4.6rem)]"
+            className="display mt-4 text-[clamp(2.6rem,6.2vw,4.6rem)]"
           >
             FAB<span className="text-accent">INS</span>
             <span className="mt-2 block text-[clamp(1.5rem,3.4vw,2.5rem)] font-bold tracking-normal text-ink-muted">

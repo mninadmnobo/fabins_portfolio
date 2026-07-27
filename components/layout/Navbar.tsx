@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { name: 'About', id: 'about' },
   { name: 'System', id: 'system' },
   { name: 'Standards', id: 'standards' },
-  { name: 'Team', id: 'team' },
+  { name: 'Innovators', id: 'innovators' },
 ]
 
 export const Navbar = () => {
@@ -128,7 +128,10 @@ export const Navbar = () => {
               e.preventDefault()
               scrollTo('contact')
             }}
-            className="btn btn-primary hidden !px-5 !py-2.5 text-[13px] sm:inline-flex"
+            className={cn(
+              'btn hidden !px-5 !py-2.5 text-[13px] sm:inline-flex transition-all duration-300',
+              activeSection === 'contact' ? 'btn-primary' : 'btn-secondary'
+            )}
           >
             Let's Connect
           </a>
@@ -171,7 +174,10 @@ export const Navbar = () => {
               e.preventDefault()
               scrollTo('contact')
             }}
-            className="btn btn-primary mt-2 w-full"
+            className={cn(
+              'btn mt-2 w-full transition-all duration-300',
+              activeSection === 'contact' ? 'btn-primary' : 'btn-secondary'
+            )}
           >
             Let's Connect
           </a>

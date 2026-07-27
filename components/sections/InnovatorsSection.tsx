@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { User, ChevronDown } from 'lucide-react'
-import { fabinsTeamMembers, TeamMember } from '@/lib/data/leaders'
-import { LeaderDetails } from '@/components/ui/LeaderDetails'
+import { fabinsInnovators, InnovatorMember } from '@/lib/data/innovators'
+import { InnovatorDetails } from '@/components/ui/InnovatorDetails'
 import { fadeUpProps } from '@/lib/animations'
 
 const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
@@ -16,17 +16,17 @@ const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   </svg>
 )
 
-export const TeamSection = () => {
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+export const InnovatorsSection = () => {
+  const [selectedMember, setSelectedMember] = useState<InnovatorMember | null>(null)
 
   return (
-    <section id="team" className="py-24 sm:py-28">
+    <section id="innovators" className="py-24 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-14 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
             <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              The team
+              <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
+              The Innovators
             </motion.span>
             <motion.h2
               {...fadeUpProps(0.1)}
@@ -44,7 +44,7 @@ export const TeamSection = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {fabinsTeamMembers.map((member, idx) => (
+          {fabinsInnovators.map((member, idx) => (
             <motion.article
               key={member.id}
               {...fadeUpProps(idx * 0.1)}
@@ -102,7 +102,7 @@ export const TeamSection = () => {
 
       <AnimatePresence>
         {selectedMember && (
-          <LeaderDetails member={selectedMember} onClose={() => setSelectedMember(null)} />
+          <InnovatorDetails member={selectedMember} onClose={() => setSelectedMember(null)} />
         )}
       </AnimatePresence>
     </section>

@@ -96,7 +96,7 @@ export const ReportSection = () => {
         {/* Header */}
         <div className="mb-14 max-w-3xl">
           <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
             Defects &amp; Four-Point Grading
           </motion.span>
           <motion.h2

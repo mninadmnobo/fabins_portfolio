@@ -7,11 +7,11 @@ const NAV = [
   { name: 'About', id: 'about' },
   { name: 'System', id: 'system' },
   { name: 'Standards', id: 'standards' },
-  { name: 'Team', id: 'team' },
+  { name: 'Innovators', id: 'innovators' },
   { name: 'Deploy FABINS', id: 'contact' },
 ]
 
-const TEAM = [
+const INNOVATORS = [
   { name: 'Md Rahinur Rahman', role: 'Lead AI Systems Engineer · EEE, BUET' },
   { name: 'Mohammad Ninad Mahmud Nobo', role: 'Lead AI Software Engineer · CSE, BUET' },
 ]
@@ -55,8 +55,7 @@ export const Footer = () => {
             </a>
 
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-muted">
-              An AI-powered fabric defect detection platform — line-scan capture, millimetre
-              measurement and a Four-Point scoring engine, retrofitted onto existing mill frames.
+              An AI-powered Fabric Defect Inspection System built for Textile Industries. It captures moving fabric, measures defects in millimetres, and issues automated Four-Point grading reports directly on existing inspection frames.
             </p>
 
             <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-3">
@@ -88,15 +87,15 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Team */}
+          {/* Innovators */}
           <div className="md:col-span-4">
             <h4 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
-              Development team
+              Innovators
             </h4>
             <ul className="mt-5 space-y-4 text-sm">
-              {TEAM.map((person) => (
+              {INNOVATORS.map((person) => (
                 <li key={person.name}>
-                  <a href="#team" onClick={(e) => scrollTo(e, 'team')} className="group block">
+                  <a href="#innovators" onClick={(e) => scrollTo(e, 'innovators')} className="group block">
                     <span className="block font-medium transition-colors group-hover:text-accent">
                       {person.name}
                     </span>

@@ -5,7 +5,7 @@ import { ProblemSection } from '@/components/sections/ProblemSection'
 import { AboutSection } from '@/components/sections/AboutSection'
 import { SystemSection } from '@/components/sections/SystemSection'
 import { ReportSection } from '@/components/sections/ReportSection'
-import { TeamSection } from '@/components/sections/TeamSection'
+import { InnovatorsSection } from '@/components/sections/InnovatorsSection'
 import { ContactSection } from '@/components/sections/ContactSection'
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
       <AboutSection />
       <SystemSection />
       <ReportSection />
-      <TeamSection />
+      <InnovatorsSection />
       <ContactSection />
     </PageShell>
   )

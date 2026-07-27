@@ -3,7 +3,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'FABINS — Fabric Inspection Automation',
+  title: 'FABINS — Future of Fabric Inspection',
   description:
     'AI-powered fabric defect detection: line-scan capture, millimetre measurement and automatic Four-Point inspection reports — a retrofit for the inspection frames mills already own.',
   icons: {

@@ -87,11 +87,11 @@ export const SystemSection = () => {
         <div className="mb-14 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
             <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
               The system
             </motion.span>
             <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">
-              FROM ROLLING CLOTH
+              FROM ROLLING FABRIC
               <br />
               TO INSTANT REPORT.
             </motion.h2>

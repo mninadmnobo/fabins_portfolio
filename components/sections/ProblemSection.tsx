@@ -21,7 +21,7 @@ export const ProblemSection = () => (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="mb-14 max-w-3xl">
         <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
           The problem
         </motion.span>
         <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">

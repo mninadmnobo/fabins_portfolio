@@ -31,7 +31,7 @@ export const ContactSection = () => {
           {/* Pitch */}
           <div className="lg:col-span-5">
             <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
               Deploy FABINS
             </motion.span>
             <motion.h2
