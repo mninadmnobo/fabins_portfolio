@@ -1,23 +1,45 @@
 /**
- * Innovators & leadership content for FABINS.
+ * PEOPLE — the team behind FABINS.
  *
- * Single source of truth for innovator members displayed in InnovatorsSection.
+ * Single source of truth, read by `InnovatorsSection` (the cards and the
+ * profile modal) and by the `Footer` (the "Innovators" column). The footer used
+ * to hardcode its own copy of these names and roles; it now reads from here, so
+ * editing a person in one place updates both.
+ *
+ * ─── TO ADD A TEAM MEMBER ───────────────────────────────────────────────────
+ * Append an entry to `fabinsInnovators` below and drop their portrait into
+ * `public/`. Both the card grid and the footer list pick it up automatically.
+ * Note the cards render in a two-column grid, so an odd number leaves a gap.
+ *
+ * ─── TO REMOVE A LINK ROW FROM A PROFILE ────────────────────────────────────
+ * Delete the field. Every `social` entry is optional and the modal only renders
+ * rows that have a value.
  */
 
 export interface InnovatorMember {
+  /** Stable key, used as the React list key. */
   id: string
   name: string
+  /** Full job title, shown on the card and in the modal header. */
   title: string
+  /** Compact "role · department" line for the footer list. */
+  shortRole: string
+  /** One-sentence summary shown on the card. */
   bio: string
+  /** Bullet list in the profile modal. */
   responsibilities: string[]
+  /** Full biography, one string per paragraph. Falls back to `bio` if omitted. */
   extendedBio?: string[]
   email?: string
+  /** Path relative to `public/`, e.g. `/rahin-photo.png`. */
   image?: string
+  /** Every field optional — the modal renders only the rows that are present. */
   social?: {
     github?: string
     linkedin?: string
     portfolio?: string
     scholar?: string
+    /** Display text for the scholar link; falls back to "Google Scholar". */
     scholarName?: string
     orcid?: string
   }
@@ -29,6 +51,7 @@ export const fabinsInnovators: InnovatorMember[] = [
     id: 'rahin',
     name: 'Md Rahinur Rahman',
     title: 'Lead AI Systems Engineer',
+    shortRole: 'Lead AI Systems Engineer · EEE, BUET',
     bio: 'Leads the design and development of industrial automation for Saturn R&D platforms.',
     extendedBio: [
       'Rahin leads the design and development of AI-powered industrial automation solutions for the R&D Department, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
@@ -54,6 +77,7 @@ export const fabinsInnovators: InnovatorMember[] = [
     id: 'ninad',
     name: 'Mohammad Ninad Mahmud Nobo',
     title: 'Lead AI Software Engineer',
+    shortRole: 'Lead AI Software Engineer · CSE, BUET',
     bio: 'Leads full-stack web development and machine learning model integration for Saturn R&D platforms.',
     extendedBio: [
       'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and Saturn R&D platforms. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures to modernize textile manufacturing.',

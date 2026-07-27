@@ -1,46 +1,39 @@
 'use client'
 
 import { ShieldCheck } from 'lucide-react'
+import { FOOTER_LINKS } from '@/lib/data/site'
+import { fabinsInnovators } from '@/lib/data/innovators'
+import { scrollToSection } from '@/lib/scroll'
 import { FabinsLogo } from '@/components/ui/FabinsLogo'
 
-const NAV = [
-  { name: 'About', id: 'about' },
-  { name: 'System', id: 'system' },
-  { name: 'Standards', id: 'standards' },
-  { name: 'Innovators', id: 'innovators' },
-  { name: 'Deploy FABINS', id: 'contact' },
-]
-
-const INNOVATORS = [
-  { name: 'Md Rahinur Rahman', role: 'Lead AI Systems Engineer · EEE, BUET' },
-  { name: 'Mohammad Ninad Mahmud Nobo', role: 'Lead AI Software Engineer · CSE, BUET' },
-]
+/**
+ * FOOTER — brand summary, navigation, and the innovator list.
+ *
+ * Both lists are read from the data layer rather than written out here:
+ *   - links   → `FOOTER_LINKS` in `lib/data/site.ts` (shared with the navbar)
+ *   - people  → `fabinsInnovators` in `lib/data/innovators.ts` (shared with
+ *               the innovators section)
+ *
+ * The people list previously duplicated the names and roles as literals, which
+ * meant updating someone's title in the data file left the footer showing the
+ * old one. Neither list should be hardcoded here again.
+ */
 
 export const Footer = () => {
-  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault()
-    if (targetId === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      return
-    }
-    const el = document.getElementById(targetId)
-    if (el) {
-      window.scrollTo({
-        top: el.getBoundingClientRect().top + window.scrollY - 96,
-        behavior: 'smooth',
-      })
-    }
+  const handleNavigate = (event: React.MouseEvent, sectionId: string) => {
+    event.preventDefault()
+    scrollToSection(sectionId)
   }
 
   return (
     <footer className="border-t border-line bg-canvas-alt/60">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
-          {/* Brand */}
+          {/* ── Brand and summary ──────────────────────────────────────── */}
           <div className="md:col-span-5">
             <a
               href="#home"
-              onClick={(e) => scrollTo(e, 'home')}
+              onClick={(event) => handleNavigate(event, 'home')}
               className="inline-flex items-center gap-3 transition-opacity hover:opacity-80"
             >
               <FabinsLogo className="h-12 w-12" />
@@ -55,7 +48,9 @@ export const Footer = () => {
             </a>
 
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-muted">
-              An AI-powered Fabric Defect Inspection System built for Textile Industries. It captures moving fabric, measures defects in millimetres, and issues automated Four-Point grading reports directly on existing inspection frames.
+              An AI-powered Fabric Defect Inspection System built for Textile Industries. It
+              captures moving fabric, measures defects in millimetres, and issues automated
+              Four-Point grading reports directly on existing inspection frames.
             </p>
 
             <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-3">
@@ -67,39 +62,43 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Navigate */}
+          {/* ── Navigation ─────────────────────────────────────────────── */}
           <div className="md:col-span-3">
             <h4 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
               Navigate
             </h4>
             <ul className="mt-5 space-y-3 text-sm">
-              {NAV.map((item) => (
-                <li key={item.id}>
+              {FOOTER_LINKS.map((link) => (
+                <li key={link.id}>
                   <a
-                    href={`#${item.id}`}
-                    onClick={(e) => scrollTo(e, item.id)}
+                    href={`#${link.id}`}
+                    onClick={(event) => handleNavigate(event, link.id)}
                     className="text-ink-muted transition-colors hover:text-accent"
                   >
-                    {item.name}
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Innovators */}
+          {/* ── Innovators ─────────────────────────────────────────────── */}
           <div className="md:col-span-4">
             <h4 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
               Innovators
             </h4>
             <ul className="mt-5 space-y-4 text-sm">
-              {INNOVATORS.map((person) => (
-                <li key={person.name}>
-                  <a href="#innovators" onClick={(e) => scrollTo(e, 'innovators')} className="group block">
+              {fabinsInnovators.map((member) => (
+                <li key={member.id}>
+                  <a
+                    href="#innovators"
+                    onClick={(event) => handleNavigate(event, 'innovators')}
+                    className="group block"
+                  >
                     <span className="block font-medium transition-colors group-hover:text-accent">
-                      {person.name}
+                      {member.name}
                     </span>
-                    <span className="mt-0.5 block text-xs text-ink-soft">{person.role}</span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">{member.shortRole}</span>
                   </a>
                 </li>
               ))}
@@ -108,6 +107,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 text-xs text-ink-soft sm:flex-row">
+          {/* Year is computed at render so the notice never goes stale. */}
           <p>© {new Date().getFullYear()} FABINS · Saturn Textiles Limited. All rights reserved.</p>
           <p className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />

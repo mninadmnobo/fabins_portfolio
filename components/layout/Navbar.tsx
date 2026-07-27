@@ -1,62 +1,42 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
+import { NAV_LINKS, PRIMARY_CTA, SECTION_IDS } from '@/lib/data/site'
+import { scrollToSection, useActiveSection, useIsScrolled } from '@/lib/scroll'
 import { cn } from '@/lib/utils'
 import { FabinsLogo } from '@/components/ui/FabinsLogo'
 
-const NAV_LINKS = [
-  { name: 'Home', id: 'home' },
-  { name: 'About', id: 'about' },
-  { name: 'System', id: 'system' },
-  { name: 'Standards', id: 'standards' },
-  { name: 'Innovators', id: 'innovators' },
-]
+/**
+ * NAVBAR — the floating pill header.
+ *
+ * Links come from `NAV_LINKS` in `lib/data/site.ts`, which the footer also
+ * reads. To add or reorder a nav item, edit that file — not this one.
+ *
+ * ─── BEHAVIOUR ──────────────────────────────────────────────────────────────
+ *   - `useIsScrolled` swaps the bar from translucent to solid once the page moves.
+ *   - `useActiveSection` highlights the link for the section in view.
+ *   - Clicks are intercepted so navigation scrolls smoothly with the header
+ *     offset applied, instead of jumping. The `href="#id"` is kept so the links
+ *     still work without JavaScript and can be opened in a new tab.
+ *
+ * The sliding highlight behind the active link is a single element shared
+ * between links via Framer Motion's `layoutId` — that is what makes it glide
+ * from one link to the next rather than cross-fade.
+ */
 
 export const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [activeSection, setActiveSection] = useState('home')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isScrolled = useIsScrolled()
+  const activeSection = useActiveSection(SECTION_IDS)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const scrollTo = (targetId: string) => {
-    setMobileMenuOpen(false)
-
-    if (targetId === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      return
-    }
-    const el = document.getElementById(targetId)
-    if (el) {
-      window.scrollTo({
-        top: el.getBoundingClientRect().top + window.scrollY - 96,
-        behavior: 'smooth',
-      })
-    }
+  /** Scrolls to a section and closes the mobile menu if it is open. */
+  const handleNavigate = (event: React.MouseEvent, sectionId: string) => {
+    event.preventDefault()
+    setIsMobileMenuOpen(false)
+    scrollToSection(sectionId)
   }
-
-  useEffect(() => {
-    const trackedIds = [...NAV_LINKS.map((l) => l.id), 'contact']
-
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 16)
-
-      const probe = window.scrollY + 200
-      let current = 'home'
-      for (let i = trackedIds.length - 1; i >= 0; i--) {
-        const el = document.getElementById(trackedIds[i])
-        if (el && el.offsetTop <= probe) {
-          current = trackedIds[i]
-          break
-        }
-      }
-      setActiveSection(current)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
@@ -70,13 +50,10 @@ export const Navbar = () => {
             : 'border-line/60 bg-panel/45'
         )}
       >
-        {/* Brand */}
+        {/* Brand — scrolls back to the top of the page. */}
         <a
           href="#home"
-          onClick={(e) => {
-            e.preventDefault()
-            scrollTo('home')
-          }}
+          onClick={(event) => handleNavigate(event, 'home')}
           className="group flex shrink-0 items-center gap-2 rounded-full py-1 pl-1 pr-3 transition-all duration-200 hover:-translate-y-0.5 hover:bg-panel-2"
         >
           <FabinsLogo className="h-11 w-11 shrink-0 sm:h-12 sm:w-12" />
@@ -90,23 +67,28 @@ export const Navbar = () => {
           </span>
         </a>
 
-        {/* Desktop nav */}
+        {/* Desktop navigation. Collapses into the mobile menu below `lg`. */}
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
             const isActive = activeSection === link.id
+
             return (
               <a
                 key={link.id}
                 href={`#${link.id}`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollTo(link.id)
-                }}
+                onClick={(event) => handleNavigate(event, link.id)}
+                aria-current={isActive ? 'true' : undefined}
                 className={cn(
                   'relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5',
-                  isActive ? 'text-[var(--btn-ink)]' : 'text-ink-muted hover:bg-accent-quiet hover:text-accent'
+                  isActive
+                    ? 'text-[var(--btn-ink)]'
+                    : 'text-ink-muted hover:bg-accent-quiet hover:text-accent'
                 )}
               >
+                {/*
+                  Shared `layoutId` means Framer Motion animates this one pill
+                  between links rather than fading a new one in per link.
+                */}
                 {isActive && (
                   <motion.span
                     layoutId="nav-pill"
@@ -114,50 +96,50 @@ export const Navbar = () => {
                     transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
+                {/* Sits above the pill so the label stays readable. */}
                 <span className="relative z-10">{link.name}</span>
               </a>
             )
           })}
         </nav>
 
-        {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Contact CTA — fills in solid once the contact section is reached. */}
           <a
-            href="#contact"
-            onClick={(e) => {
-              e.preventDefault()
-              scrollTo('contact')
-            }}
+            href={`#${PRIMARY_CTA.id}`}
+            onClick={(event) => handleNavigate(event, PRIMARY_CTA.id)}
             className={cn(
-              'btn hidden !px-5 !py-2.5 text-[13px] sm:inline-flex transition-all duration-300',
-              activeSection === 'contact' ? 'btn-primary' : 'btn-secondary'
+              'btn hidden !px-5 !py-2.5 text-[13px] transition-all duration-300 sm:inline-flex',
+              activeSection === PRIMARY_CTA.id ? 'btn-primary' : 'btn-secondary'
             )}
           >
-            Let's Connect
+            {PRIMARY_CTA.name}
           </a>
+
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
             aria-label="Toggle menu"
-            aria-expanded={mobileMenuOpen}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-panel text-ink-muted transition-colors hover:border-line-strong hover:text-accent lg:hidden"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-line bg-panel/95 p-3 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl lg:hidden">
+      {/* Mobile menu — same destinations, stacked. Closes on any selection. */}
+      {isMobileMenuOpen && (
+        <div
+          id="mobile-menu"
+          className="mx-auto mt-2 max-w-7xl rounded-3xl border border-line bg-panel/95 p-3 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl lg:hidden"
+        >
           {NAV_LINKS.map((link) => (
             <a
               key={link.id}
               href={`#${link.id}`}
-              onClick={(e) => {
-                e.preventDefault()
-                scrollTo(link.id)
-              }}
+              onClick={(event) => handleNavigate(event, link.id)}
               className={cn(
                 'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200',
                 activeSection === link.id
@@ -168,18 +150,16 @@ export const Navbar = () => {
               {link.name}
             </a>
           ))}
+
           <a
-            href="#contact"
-            onClick={(e) => {
-              e.preventDefault()
-              scrollTo('contact')
-            }}
+            href={`#${PRIMARY_CTA.id}`}
+            onClick={(event) => handleNavigate(event, PRIMARY_CTA.id)}
             className={cn(
               'btn mt-2 w-full transition-all duration-300',
-              activeSection === 'contact' ? 'btn-primary' : 'btn-secondary'
+              activeSection === PRIMARY_CTA.id ? 'btn-primary' : 'btn-secondary'
             )}
           >
-            Let's Connect
+            {PRIMARY_CTA.name}
           </a>
         </div>
       )}

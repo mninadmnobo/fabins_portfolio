@@ -4,22 +4,37 @@ import { motion } from 'framer-motion'
 import { ShieldCheck } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 
+/**
+ * HERO SECTION — the opening screen: product name, promise, and machine photo.
+ *
+ * This is the only section whose copy is written inline rather than read from
+ * `lib/data/`. That is deliberate: the hero is a one-off with bespoke typography
+ * and a hand-tuned animation cascade, so there is nothing to gain from moving
+ * six strings into a data file that only this component would ever read.
+ *
+ * It also does not use `SectionHeader`, because it renders an `<h1>` (there is
+ * exactly one per page) with a two-tier title and its own entrance timing.
+ *
+ * ─── ON THE ANIMATION DELAYS ────────────────────────────────────────────────
+ * The delays below (0.05 → 0.30) stagger the entrance top to bottom. Keep them
+ * ascending in source order; the machine photo at 0.20 is timed to land while
+ * the copy is still arriving.
+ */
+
 export const HeroSection = () => (
   <section id="home" className="relative overflow-hidden pb-20 pt-10 sm:pt-16">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
-        {/* Copy */}
+        {/* ── Left: headline and calls to action ─────────────────────────── */}
         <div className="lg:col-span-6">
           <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
+            <span className="h-2 w-2 rounded-full bg-accent sm:h-2.5 sm:w-2.5" />
             Future of Fabric Inspection
           </motion.span>
 
-          <motion.h1
-            {...fadeUpProps(0.12)}
-            className="display mt-4 text-[clamp(2.6rem,6.2vw,4.6rem)]"
-          >
+          <motion.h1 {...fadeUpProps(0.12)} className="display mt-4 text-[clamp(2.6rem,6.2vw,4.6rem)]">
             FAB<span className="text-accent">INS</span>
+            {/* Subtitle sits inside the h1 so it is part of the page's one heading. */}
             <span className="mt-2 block text-[clamp(1.5rem,3.4vw,2.5rem)] font-bold tracking-normal text-ink-muted">
               Fabric Inspection Automation
             </span>
@@ -32,6 +47,7 @@ export const HeroSection = () => (
             Every defect caught. Every millimetre measured. Every roll graded.
           </motion.p>
 
+          {/* Both buttons scroll to a section further down the same page. */}
           <motion.div {...fadeUpProps(0.24)} className="mt-9 flex flex-wrap items-center gap-3">
             <a href="#system" className="btn btn-primary">
               See how it works
@@ -41,18 +57,16 @@ export const HeroSection = () => (
             </a>
           </motion.div>
 
-          <motion.p
-            {...fadeUpProps(0.3)}
-            className="mt-7 flex items-start gap-2 text-sm text-ink-soft"
-          >
+          <motion.p {...fadeUpProps(0.3)} className="mt-7 flex items-start gap-2 text-sm text-ink-soft">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
             Automate Fabric Inspection with FABINS.
           </motion.p>
         </div>
 
-        {/* Machine */}
+        {/* ── Right: machine photograph ──────────────────────────────────── */}
         <motion.div {...fadeUpProps(0.2)} className="relative lg:col-span-6">
           <div className="relative overflow-hidden rounded-[2rem] border border-line bg-panel-2 shadow-[var(--shadow-lift)]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- see note in README on image optimisation */}
             <img
               src="/fabins-machine.png"
               alt="FABINS line-scan inspection rig running fabric with a live operator dashboard"
