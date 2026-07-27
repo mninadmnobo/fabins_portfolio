@@ -41,12 +41,10 @@ fabins_portfolio/
 │                           # DevelopmentTeam, DeployFabins
 ├── lib/
 │   ├── data/
-│   │   ├── fabins-poc.ts   # Complete single source of truth for POC document data
-│   │   └── leaders.ts      # Leadership & Engineering Team single source of truth
+│   │   ├── fabins-system.ts # Complete single source of truth for FABINS system dataset
+│   │   └── innovators.ts   # Innovators & Engineering Team single source of truth
 │   ├── animations.ts       # Shared Framer Motion scroll entrance presets
-│   └── utils.ts            # Class merging & date formatting utilities
-└── docs/
-    └── FABINS_POC_SPEC.md  # Complete engineering specification of the POC
+│   └── utils.ts            # Class merging & utility functions
 ```
 
 ---

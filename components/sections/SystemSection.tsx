@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Camera, Sliders, Sun, Monitor, Cpu, Sparkles } from 'lucide-react'
-import { FABINS_POC_DATA } from '@/lib/data/fabins-poc'
+import { FABINS_SYSTEM_DATA } from '@/lib/data/fabins-system'
 import { fadeUpProps } from '@/lib/animations'
 import { cn } from '@/lib/utils'
 
@@ -12,7 +12,7 @@ const HARDWARE_ICONS = [Camera, Sliders, Sun, Monitor]
 export const SystemSection = () => {
   const [centeredIndex, setCenteredIndex] = useState<number>(0)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const steps = FABINS_POC_DATA.pipelineSteps
+  const steps = FABINS_SYSTEM_DATA.pipelineSteps
 
   // Detect which card is closest to the center of the scroll container
   const handleScroll = useCallback(() => {
@@ -217,7 +217,7 @@ export const SystemSection = () => {
           </motion.h3>
 
           <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {FABINS_POC_DATA.hardwarePillars.map((pillar, idx) => {
+            {FABINS_SYSTEM_DATA.hardwarePillars.map((pillar, idx) => {
               const Icon = HARDWARE_ICONS[idx] || Cpu
               return (
                 <motion.div key={pillar.id} {...fadeUpProps(idx * 0.07)} className="card card-hover">

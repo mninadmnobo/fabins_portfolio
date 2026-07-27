@@ -30,11 +30,14 @@ export const InnovatorsSection = () => {
             </motion.span>
             <motion.h2
               {...fadeUpProps(0.1)}
-              className="display mt-5 text-[clamp(1.4rem,2.6vw,2.15rem)]"
+              className="display mt-5"
             >
-              INNOVATORS BEHIND
-              <br />
-              FAB<span className="text-accent">INS</span>
+              <span className="block text-[clamp(1.1rem,1.8vw,1.45rem)] font-extrabold tracking-tight opacity-90">
+                INNOVATORS BEHIND
+              </span>
+              <span className="block text-[clamp(2.1rem,4vw,3.15rem)]">
+                FAB<span className="text-accent">INS</span>
+              </span>
             </motion.h2>
           </div>
           <motion.p {...fadeUpProps(0.16)} className="max-w-md leading-relaxed text-ink-muted">

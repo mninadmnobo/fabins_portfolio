@@ -12,83 +12,12 @@ import {
   ChevronRight,
   Layers,
 } from 'lucide-react'
+import { FABINS_SYSTEM_DATA } from '@/lib/data/fabins-system'
 import { fadeUpProps } from '@/lib/animations'
 import { cn } from '@/lib/utils'
 
-// ASTM D5430 Four-Point Rule Breakdown
-const FOUR_POINT_RULES = [
-  {
-    points: '1 Point',
-    size: 'Up to 3 inches (75 mm)',
-    desc: 'Minor defect or short localized yarn imperfection.',
-    badge: 'border-blue-500/30 bg-blue-500/10 text-blue-700',
-  },
-  {
-    points: '2 Points',
-    size: '3 to 6 inches (75 – 150 mm)',
-    desc: 'Medium imperfection extending across several warp/weft yarns.',
-    badge: 'border-amber-500/30 bg-amber-500/10 text-amber-700',
-  },
-  {
-    points: '3 Points',
-    size: '6 to 9 inches (150 – 230 mm)',
-    desc: 'Major imperfection affecting fabric appearance or strength.',
-    badge: 'border-orange-500/30 bg-orange-500/10 text-orange-700',
-  },
-  {
-    points: '4 Points',
-    size: 'Over 9 inches (230 mm+) or Holes',
-    desc: 'Critical defect or any physical hole/tear regardless of size.',
-    badge: 'border-red-500/30 bg-red-500/10 text-red-700',
-  },
-]
-
-// Common Fabric Defects & How They're Scored
-const DEFECT_EXPLANATIONS = [
-  {
-    id: 'hole',
-    name: 'Hole / Physical Tear',
-    scoring: '4 Points (Fixed Override)',
-    whatIsIt: 'A rupture or missing warp/weft yarns caused by needle breakage, sharp objects, or loom friction.',
-    howCalculated: 'Under ASTM D5430, any physical hole or tear automatically receives a maximum 4-point penalty, regardless of how small its diameter is.',
-    tagColor: 'bg-red-500/10 text-red-700 border-red-500/30',
-  },
-  {
-    id: 'slub',
-    name: 'Yarn Slub / Thick Place',
-    scoring: '1 – 2 Points (By Length)',
-    whatIsIt: 'An abnormal yarn thickening or lump that creates a visible streak across the woven or knitted surface.',
-    howCalculated: 'Sized in millimeters by high-speed vision cameras. Slubs under 75mm score 1 point; slubs between 75mm–150mm score 2 points.',
-    tagColor: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
-  },
-  {
-    id: 'oil',
-    name: 'Machine Oil Stain',
-    scoring: '1 – 3 Points (By Size)',
-    whatIsIt: 'Dark lubricant drops transferred onto the cloth from high-speed loom bearings or weaving machinery.',
-    howCalculated: 'Evaluated by physical area and contrast under calibrated high-CRI lighting. Small spots score 1 point; larger streaks score 2–3 points.',
-    tagColor: 'bg-orange-500/10 text-orange-700 border-orange-500/30',
-  },
-  {
-    id: 'shading',
-    name: 'Color Shade Variation',
-    scoring: '3 Points (Per Meter)',
-    whatIsIt: 'Uneven dye absorption or tone banding resulting in visible side-to-center or end-to-end color mismatch.',
-    howCalculated: 'Detected via multispectral camera sensors. Assigned 3 points per affected meter of fabric roll length.',
-    tagColor: 'bg-purple-500/10 text-purple-700 border-purple-500/30',
-  },
-  {
-    id: 'needle',
-    name: 'Needle Line / Drop Stitch',
-    scoring: '2 – 4 Points (Continuous)',
-    whatIsIt: 'A continuous vertical stripe or missing loop caused by a bent or broken needle on knitting cylinders.',
-    howCalculated: 'Measured along the continuous defect run. Scored per linear segment according to length thresholds.',
-    tagColor: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/30',
-  },
-]
-
-export const ReportSection = () => {
-  const [activeDefect, setActiveDefect] = useState(DEFECT_EXPLANATIONS[0])
+export const StandardsSection = () => {
+  const [activeDefect, setActiveDefect] = useState(FABINS_SYSTEM_DATA.standardsDefects[0])
 
   return (
     <section id="standards" className="py-24 sm:py-28 bg-canvas-alt/40 border-y border-line">
@@ -120,7 +49,7 @@ export const ReportSection = () => {
           </h3>
 
           <motion.div {...fadeUpProps(0.2)} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FOUR_POINT_RULES.map((rule, idx) => (
+            {FABINS_SYSTEM_DATA.standardsRules.map((rule, idx) => (
               <div
                 key={idx}
                 className="card !p-5 transition-all duration-300 hover:-translate-y-1"
@@ -157,7 +86,7 @@ export const ReportSection = () => {
                 </div>
 
                 <div className="space-y-3">
-                  {DEFECT_EXPLANATIONS.map((defect) => {
+                  {FABINS_SYSTEM_DATA.standardsDefects.map((defect) => {
                     const isSelected = activeDefect.id === defect.id
                     return (
                       <button
@@ -291,3 +220,5 @@ export const ReportSection = () => {
     </section>
   )
 }
+
+

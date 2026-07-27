@@ -2,49 +2,41 @@
 
 import { motion } from 'framer-motion'
 import { X, Check } from 'lucide-react'
-import { FABINS_POC_DATA } from '@/lib/data/fabins-poc'
+import { FABINS_SYSTEM_DATA } from '@/lib/data/fabins-system'
 import { fadeUpProps } from '@/lib/animations'
 
 export const AboutSection = () => (
   <section id="about" className="py-24 sm:py-28">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* Sticky heading */}
-        <div className="lg:col-span-5">
-          <div className="lg:sticky lg:top-32">
-            <motion.span {...fadeUpProps(0.05)} className="eyebrow">
-              <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
-              About FAB<span className="text-accent">INS</span>
-            </motion.span>
-            <motion.h2
-              {...fadeUpProps(0.1)}
-              className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]"
-            >
-              RETROFIT,
-              <br />
-              NOT REPLACE.
-            </motion.h2>
-            <motion.p {...fadeUpProps(0.16)} className="mt-6 max-w-md leading-relaxed text-ink-muted">
-              Imported inspection systems ask a mill to throw away its inspection machine. FABINS
-              is built as a low-cost, high-precision upgrade that mounts onto the frames a factory
-              already runs.
-            </motion.p>
-          </div>
+      {/* Header */}
+      <div className="mb-14 max-w-3xl">
+        <motion.span {...fadeUpProps(0.05)} className="eyebrow">
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-accent" />
+          The Strategy
+        </motion.span>
+        <motion.h2 {...fadeUpProps(0.1)} className="display mt-5 text-[clamp(2rem,4.4vw,3.25rem)]">
+          WHY RETROFIT EXISTING
+          <br />
+          <span className="text-accent">INSPECTION FRAMES?</span>
+        </motion.h2>
+        <motion.p {...fadeUpProps(0.16)} className="mt-4 leading-relaxed text-ink-muted">
+          Importing complete automated inspection machines from abroad requires millions in capital expenditure and disruptive factory floor redesign. FABINS upgrades the inspection frames already sitting in Bangladeshi mills.
+        </motion.p>
+      </div>
+
+      {/* Retrofit vs Conventional Machine Grid */}
+      <motion.div {...fadeUpProps(0.22)} className="overflow-hidden rounded-3xl border border-line bg-panel shadow-sm">
+        <div className="grid grid-cols-12 border-b border-line bg-panel-2 px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-ink-soft">
+          <div className="col-span-3 sm:col-span-3">Dimension</div>
+          <div className="col-span-4 sm:col-span-4 text-rose-500/80">Conventional Machine</div>
+          <div className="col-span-5 sm:col-span-5 text-accent font-extrabold">FABINS Retrofit</div>
         </div>
 
-        {/* Comparison rows */}
-        <div className="lg:col-span-7">
-          <div className="mb-3 hidden grid-cols-12 gap-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-soft sm:grid">
-            <span className="col-span-3" />
-            <span className="col-span-4">Conventional</span>
-            <span className="col-span-5 text-accent">FABINS</span>
-          </div>
-
-          {FABINS_POC_DATA.retrofitComparisons.map((row, idx) => (
-            <motion.div
+        <div className="divide-y divide-line/60">
+          {FABINS_SYSTEM_DATA.aboutComparisons.map((row) => (
+            <div
               key={row.dimension}
-              {...fadeUpProps(idx * 0.06)}
-              className="grid grid-cols-1 gap-4 border-t border-line py-6 sm:grid-cols-12 sm:items-start sm:gap-6"
+              className="grid grid-cols-1 gap-4 px-6 py-6 sm:grid-cols-12 sm:items-start sm:gap-6"
             >
               <span className="text-lg font-semibold tracking-tight sm:col-span-3">
                 {row.dimension}
@@ -67,11 +59,10 @@ export const AboutSection = () => (
                 </span>
                 <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{row.fabinsDetail}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
-          <div className="border-t border-line" />
         </div>
-      </div>
+      </motion.div>
     </div>
   </section>
 )

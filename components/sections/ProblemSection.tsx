@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { UserX, Clock, BarChart2, Database, Zap, Globe, ShieldAlert, Cpu } from 'lucide-react'
-import { FABINS_POC_DATA } from '@/lib/data/fabins-poc'
+import { FABINS_SYSTEM_DATA } from '@/lib/data/fabins-system'
 import { fadeUpProps } from '@/lib/animations'
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -17,7 +17,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 }
 
 export const ProblemSection = () => (
-  <section className="py-24 sm:py-28">
+  <section id="problem" className="py-24 sm:py-28">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="mb-14 max-w-3xl">
         <motion.span {...fadeUpProps(0.05)} className="eyebrow">
@@ -37,7 +37,7 @@ export const ProblemSection = () => (
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {FABINS_POC_DATA.industryProblems.slice(0, 4).map((item, idx) => {
+        {FABINS_SYSTEM_DATA.problemItems.slice(0, 4).map((item, idx) => {
           const Icon = ICON_MAP[item.iconName] || Cpu
           return (
             <motion.div key={item.id} {...fadeUpProps(idx * 0.07)} className="card card-hover">
