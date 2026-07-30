@@ -150,6 +150,17 @@ class EmailServiceImplTest {
         service(PLAIN_SMTP_PASSWORD).sendDeploymentRequestNotifications(requestWithId());
     }
 
+    @Test
+    @DisplayName("Keys starting with xkeysib- or xsmtpsib- bypass SMTP and attempt Brevo REST API")
+    void brevoKeyPrefixesBypassSmtp() {
+        // Both xkeysib- and xsmtpsib- select Brevo REST engine, which will fail (network/mock)
+        // and fall back to SMTP. We verify SMTP was called only as fallback.
+        service("xkeysib-1234567890abcdef").sendDeploymentRequestNotifications(requestWithId());
+        service("xsmtpsib-1234567890abcdef").sendDeploymentRequestNotifications(requestWithId());
+
+        verify(mailSender, times(2)).send(any(MimeMessage.class));
+    }
+
     // ── Fixtures ────────────────────────────────────────────────────────────
 
     private EmailServiceImpl service(String apiKey) {

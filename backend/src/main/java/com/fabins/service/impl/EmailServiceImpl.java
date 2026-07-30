@@ -64,8 +64,9 @@ public class EmailServiceImpl implements EmailService {
     /** Brevo's transactional email endpoint. HTTPS only, so port 443. */
     private static final URI BREVO_ENDPOINT = URI.create("https://api.brevo.com/v3/smtp/email");
 
-    /** Brevo issues SMTP/API keys with this prefix; anything else is a plain SMTP password. */
-    private static final String BREVO_KEY_PREFIX = "xsmtpsib-";
+    /** Brevo issues keys starting with xsmtpsib- (legacy/SMTP keys) or xkeysib- (v3 REST/MCP keys). */
+    private static final String BREVO_KEY_PREFIX_SMTP = "xsmtpsib-";
+    private static final String BREVO_KEY_PREFIX_REST = "xkeysib-";
 
     /** Caps how long a hung network path can occupy an async worker thread. */
     private static final Duration HTTP_TIMEOUT = Duration.ofSeconds(10);
@@ -271,9 +272,10 @@ public class EmailServiceImpl implements EmailService {
             return;
         }
 
-        // Engine 1 — HTTPS REST. Returns false (already logged) on any failure
-        // so that a Brevo outage still gets a shot at the SMTP path below.
-        if (apiKey.startsWith(BREVO_KEY_PREFIX) && sendViaBrevoApi(to, subject, html, replyTo, apiKey)) {
+        String trimmedKey = apiKey.trim();
+        boolean isBrevoKey = trimmedKey.startsWith(BREVO_KEY_PREFIX_SMTP) || trimmedKey.startsWith(BREVO_KEY_PREFIX_REST);
+
+        if (isBrevoKey && sendViaBrevoApi(to, subject, html, replyTo, trimmedKey)) {
             return;
         }
 
