@@ -34,6 +34,18 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:saturn.rnd.innovation@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   jackson:
     # Serialise Instant as ISO-8601 ("2026-07-27T18:30:00Z") rather than as an
     # epoch number, so responses are readable and unambiguous about timezone.
@@ -84,6 +96,13 @@ fabins:
     # Development-only default. The prod profile removes it so that a missing
     # environment variable fails the boot rather than shipping a known password.
     password: ${FABINS_ADMIN_PASSWORD:change-me-in-production}
+
+  mail:
+    admin-address: ${FABINS_ADMIN_ADDRESS:saturn.rnd.innovation@gmail.com}
+    from-address: ${SPRING_MAIL_FROM:saturn.rnd.innovation@gmail.com}
+    admin-subject: "[FABINS Alert] New Deployment Enquiry: %s"
+    sender-subject: "FABINS Deployment Assessment Request Received — Ref: %s"
+    acknowledgement-subject: "[Acknowledged] FABINS Deployment Request — Ref: %s"
 
 logging:
   level:

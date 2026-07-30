@@ -64,6 +64,12 @@
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
 
+    <!-- JavaMailSender for automated email notifications. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+
     <!-- Versioned, repeatable schema migrations. See db/migration. -->
     <dependency>
       <groupId>org.flywaydb</groupId>

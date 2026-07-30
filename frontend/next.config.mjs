@@ -16,6 +16,13 @@ const nextConfig = {
    * macOS/Linux), or delete the option entirely if you only ever use localhost.
    * It is a development-only setting and is ignored in production.
    */
+  /**
+   * Automatically leverages output trace features to create a standalone build
+   * folder that includes only the necessary node_modules for production, drastically
+   * reducing Docker container image size.
+   */
+  output: 'standalone',
+
   allowedDevOrigins: ['192.168.68.103', '192.168.68.103:3000'],
 }
 

@@ -1,0 +1,13 @@
+# Maven build output & temporary files
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.git
+.gitignore
+.vscode
+.idea
+Dockerfile
+.dockerignore
+README.md
+*.log

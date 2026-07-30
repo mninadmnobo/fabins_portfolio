@@ -53,4 +53,12 @@ public interface DeploymentRequestService {
      * @throws ResourceNotFoundException if no request has that id
      */
     DeploymentRequestResponse changeStatus(UUID id, DeploymentRequestStatus newStatus);
+
+    /**
+     * Acknowledges a deployment request (moving status to IN_REVIEW) and sends an acknowledgement email to sender.
+     *
+     * @param id the request id
+     * @return updated response
+     */
+    DeploymentRequestResponse acknowledge(UUID id);
 }

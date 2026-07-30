@@ -14,9 +14,10 @@ import java.util.List;
  *
  * @param cors  browser origin rules
  * @param admin credentials for the protected endpoints
+ * @param mail  email notification configuration
  */
 @ConfigurationProperties(prefix = "fabins")
-public record ApiProperties(Cors cors, Admin admin) {
+public record ApiProperties(Cors cors, Admin admin, Mail mail) {
 
     /**
      * Which browser origins may call this API.
@@ -40,5 +41,22 @@ public record ApiProperties(Cors cors, Admin admin) {
      *                 profile has no default and will refuse to boot without it.
      */
     public record Admin(String username, String password) {
+    }
+
+    /**
+     * Email notification settings and templates metadata.
+     *
+     * @param adminAddress recipient address for internal alert notifications
+     * @param fromAddress  sender address on outgoing emails
+     * @param adminSubject subject format string for internal alerts
+     * @param senderSubject subject format string for sender confirmations
+     */
+    public record Mail(
+            String adminAddress,
+            String fromAddress,
+            String adminSubject,
+            String senderSubject,
+            String acknowledgementSubject
+    ) {
     }
 }

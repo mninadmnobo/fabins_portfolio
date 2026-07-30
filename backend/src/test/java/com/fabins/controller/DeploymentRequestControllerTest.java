@@ -35,6 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>{@code @Transactional} rolls each test back afterwards, so tests cannot
  * see each other's rows and can run in any order.
  */
+import com.fabins.service.EmailService;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -47,6 +50,9 @@ class DeploymentRequestControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private EmailService emailService;
 
     private MockMvc mockMvc;
 

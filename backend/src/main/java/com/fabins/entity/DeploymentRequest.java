@@ -150,4 +150,15 @@ public class DeploymentRequest {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+
+    /**
+     * Contextual human-readable reference code for email notifications and customer support.
+     * Format: FAB-2026-[SHORT_UUID], e.g. FAB-2026-ABB5B9D6
+     */
+    public String getReferenceCode() {
+        if (id == null) {
+            return "FAB-2026-PENDING";
+        }
+        return "FAB-2026-" + id.toString().split("-")[0].toUpperCase();
+    }
 }

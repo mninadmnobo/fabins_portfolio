@@ -42,6 +42,7 @@ public class DeploymentRequestMapper {
     public DeploymentRequestResponse toResponse(DeploymentRequest entity) {
         return new DeploymentRequestResponse(
                 entity.getId(),
+                entity.getReferenceCode(),
                 entity.getMillName(),
                 entity.getContactName(),
                 entity.getEmail(),

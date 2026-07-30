@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New FABINS Deployment Request</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 30px 15px;
+    }
+    .wrapper {
+      max-width: 620px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      border: 1px solid #e2e8f0;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%);
+      padding: 28px 32px;
+      color: #ffffff;
+    }
+    .header-subtitle {
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .body-content {
+      padding: 32px;
+    }
+    .ref-badge {
+      display: inline-block;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 6px;
+    }
+    .info-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .info-grid td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .info-grid td.label {
+      font-weight: 600;
+      color: #64748b;
+      width: 35%;
+      background-color: #fafafa;
+    }
+    .message-box {
+      background-color: #f8fafc;
+      border-left: 4px solid #0284c7;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: #334155;
+      font-style: normal;
+      margin: 15px 0 25px 0;
+    }
+    .cta-container {
+      text-align: center;
+      margin: 32px 0 20px 0;
+    }
+    .btn-acknowledge {
+      display: inline-block;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+    .footer {
+      background-color: #f8fafc;
+      padding: 20px 32px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div class="header-subtitle">Saturn Textiles R&amp;D Division</div>
+      <h1 class="header-title">🔬 New FABINS Retrofit Enquiry</h1>
+    </div>
+
+    <div class="body-content">
+      <div class="ref-badge">Tracking ID: {{requestId}}</div>
+
+      <p style="margin-top: 0; font-size: 15px; color: #334155;">
+        A new fabric inspection frame assessment enquiry has been submitted on the FABINS portal.
+      </p>
+
+      <div class="section-title">Client &amp; Contact Details</div>
+      <table class="info-grid">
+        <tr>
+          <td class="label">Mill / Organization</td>
+          <td><strong>{{millName}}</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Contact Representative</td>
+          <td>{{contactName}}</td>
+        </tr>
+        <tr>
+          <td class="label">Direct Email</td>
+          <td><a href="mailto:{{email}}" style="color: #0284c7;">{{email}}</a></td>
+        </tr>
+        <tr>
+          <td class="label">Phone / WhatsApp</td>
+          <td>{{phone}}</td>
+        </tr>
+        <tr>
+          <td class="label">Submission Date</td>
+          <td>{{submittedAt}}</td>
+        </tr>
+      </table>
+
+      <div class="section-title">Submitted Scope &amp; Technical Notes</div>
+      <div class="message-box">
+        {{message}}
+      </div>
+
+      <div class="cta-container">
+        <a href="{{acknowledgeUrl}}" class="btn-acknowledge">
+          &#10003; Acknowledge Request &amp; Notify Mill
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      Saturn Textiles Limited — AI Machine Vision Systems R&amp;D Department<br/>
+      Automated Fabric Defect Inspection System (FABINS)
+    </div>
+  </div>
+</body>
+</html>

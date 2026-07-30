@@ -145,4 +145,38 @@ public class DeploymentRequestController {
     ) {
         return service.changeStatus(id, request.status());
     }
+
+    /**
+     * Acknowledges a request and dispatches an acknowledgement email to the sender.
+     * Publicly accessible via GET to support 1-click email link acknowledgment.
+     */
+    @GetMapping("/{id}/acknowledge")
+    @PostMapping("/{id}/acknowledge")
+    @Operation(summary = "Acknowledge a deployment request and notify sender")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request acknowledged and notification sent"),
+            @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
+    })
+    public ResponseEntity<String> acknowledge(@PathVariable UUID id) {
+        DeploymentRequestResponse response = service.acknowledge(id);
+        String htmlResponse = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Request Acknowledged</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; line-height: 1.6; background-color: #f8fafc;">
+              <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="color: #16a34a; margin-top: 0;">&#10003; Request Successfully Acknowledged</h2>
+                <p style="font-size: 15px; color: #1e293b;">Deployment Request Reference: <strong>%s</strong> for <strong>%s</strong> has been acknowledged by Saturn R&D Team.</p>
+                <p style="color: #64748b; font-size: 14px;">A confirmation email has been dispatched to <strong>%s</strong> confirming our team will contact them within 24 hours.</p>
+              </div>
+            </body>
+            </html>
+            """.formatted(response.referenceCode(), response.millName(), response.email());
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/html;charset=UTF-8"))
+                .body(htmlResponse);
+    }
 }

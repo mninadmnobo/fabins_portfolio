@@ -8,6 +8,7 @@ import com.fabins.entity.enums.DeploymentRequestStatus;
 import com.fabins.exception.ResourceNotFoundException;
 import com.fabins.mapper.DeploymentRequestMapper;
 import com.fabins.repository.DeploymentRequestRepository;
+import com.fabins.service.EmailService;
 import com.fabins.service.DeploymentRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class DeploymentRequestServiceImpl implements DeploymentRequestService {
 
     private final DeploymentRequestRepository repository;
     private final DeploymentRequestMapper mapper;
+    private final EmailService emailService;
 
     /**
      * Constructor injection — no {@code @Autowired} needed on a single
@@ -48,9 +50,11 @@ public class DeploymentRequestServiceImpl implements DeploymentRequestService {
      * {@code new}.
      */
     public DeploymentRequestServiceImpl(DeploymentRequestRepository repository,
-                                        DeploymentRequestMapper mapper) {
+                                         DeploymentRequestMapper mapper,
+                                         EmailService emailService) {
         this.repository = repository;
         this.mapper = mapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -61,6 +65,9 @@ public class DeploymentRequestServiceImpl implements DeploymentRequestService {
         // Log the id and the mill, never the email or message: those are
         // personal data and logs are retained far longer than they should be.
         log.info("Deployment request {} submitted by mill '{}'", saved.getId(), saved.getMillName());
+
+        // Dispatch async email notifications to saturn.rnd.innovation@gmail.com and the mill contact
+        emailService.sendDeploymentRequestNotifications(saved);
 
         return mapper.toResponse(saved);
     }
@@ -98,6 +105,20 @@ public class DeploymentRequestServiceImpl implements DeploymentRequestService {
         request.changeStatus(newStatus);
 
         log.info("Deployment request {} moved from {} to {}", id, previous, newStatus);
+
+        return mapper.toResponse(request);
+    }
+
+    @Override
+    @Transactional
+    public DeploymentRequestResponse acknowledge(UUID id) {
+        DeploymentRequest request = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Deployment request", id));
+
+        request.changeStatus(DeploymentRequestStatus.IN_REVIEW);
+        log.info("Deployment request {} acknowledged by R&D team", id);
+
+        emailService.sendAcknowledgementNotification(request);
 
         return mapper.toResponse(request);
     }

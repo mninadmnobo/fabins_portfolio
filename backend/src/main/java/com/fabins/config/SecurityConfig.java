@@ -72,8 +72,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // Public: the website's contact form.
+                        // Public: the website's contact form and email acknowledgment link.
                         .requestMatchers(HttpMethod.POST, "/api/v1/deployment-requests").permitAll()
+                        .requestMatchers("/api/v1/deployment-requests/*/acknowledge").permitAll()
 
                         // Public: liveness probe for load balancers.
                         .requestMatchers("/actuator/health/**").permitAll()

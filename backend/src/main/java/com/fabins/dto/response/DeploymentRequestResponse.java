@@ -23,6 +23,9 @@ public record DeploymentRequestResponse(
         @Schema(description = "Server-generated identifier")
         UUID id,
 
+        @Schema(description = "Contextual human-readable reference code, e.g. FAB-2026-ABB5B9D6")
+        String referenceCode,
+
         String millName,
         String contactName,
         String email,
