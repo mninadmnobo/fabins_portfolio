@@ -36,18 +36,22 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Async
     public void sendDeploymentRequestNotifications(DeploymentRequest request) {
+        log.info("🚀 Starting background email dispatch for deployment request id {} [Ref: {}]",
+                request.getId(), request.getReferenceCode());
         try {
             sendAdminNotification(request);
             sendSenderConfirmation(request);
         } catch (Exception e) {
-            log.error("Failed to send deployment request email notifications for request id {}: {}",
-                    request.getId(), e.getMessage());
+            log.error("❌ Failed to send deployment request email notifications for request id {}: ",
+                    request.getId(), e);
         }
     }
 
     @Override
     @Async
     public void sendAcknowledgementNotification(DeploymentRequest request) {
+        log.info("🚀 Starting background acknowledgement email dispatch for request id {} [Ref: {}]",
+                request.getId(), request.getReferenceCode());
         try {
             String adminEmail = apiProperties.mail().adminAddress();
             String fromEmail = apiProperties.mail().fromAddress();
@@ -64,8 +68,8 @@ public class EmailServiceImpl implements EmailService {
             sendHtmlEmail(request.getEmail(), fromEmail, subject, content, adminEmail);
             log.info("Acknowledgement confirmation email dispatched to {} [Ref: {}]", request.getEmail(), refCode);
         } catch (Exception e) {
-            log.error("Failed to send acknowledgement email for request id {}: {}",
-                    request.getId(), e.getMessage(), e);
+            log.error("Failed to send acknowledgement email for request id {}: ",
+                    request.getId(), e);
         }
     }
 
@@ -144,7 +148,11 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(from);
+            try {
+                helper.setFrom(from, "Saturn Textiles R&D");
+            } catch (Exception ignored) {
+                helper.setFrom(from);
+            }
             helper.setTo(to);
             if (replyTo != null && !replyTo.isBlank()) {
                 helper.setReplyTo(replyTo);
