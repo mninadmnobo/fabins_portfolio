@@ -182,7 +182,7 @@ public class DeploymentRequestController {
                                 </head>
                                 <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; line-height: 1.6; background-color: #f8fafc;">
                                   <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                                    <h2 style="color: #16a34a; margin-top: 0;">&#10003; Request Successfully Acknowledged</h2>
+                                    <h2 style="color: #0f172a; margin-top: 0;"><span style="color: #2563eb;">&#10003;</span> Request Successfully Acknowledged</h2>
                                     <p style="font-size: 15px; color: #1e293b;">Deployment Request Reference: <strong>%s</strong> for <strong>%s</strong> has been acknowledged by Saturn R&D Team.</p>
                                     <p style="color: #64748b; font-size: 14px;">A confirmation email has been dispatched to <strong>%s</strong> confirming our team will contact them within 24 hours.</p>
                                   </div>
