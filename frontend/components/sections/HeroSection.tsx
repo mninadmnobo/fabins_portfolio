@@ -41,25 +41,23 @@ export const HeroSection = () => (
           </motion.h1>
 
           {/* Wonderful 3-Pillar Tagline Component */}
-          <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-3">
+          <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-4">
             <p className="max-w-xl text-lg font-medium leading-relaxed text-ink-muted sm:text-xl">
-              <span className="text-ink font-semibold">Zero defect escapes.</span>{' '}
-              <span className="text-ink font-semibold">Sub-millimetre precision.</span>{' '}
-              <span className="text-ink font-semibold">Automated 4-point grading.</span>
+              Next-generation industrial AI that <span className="text-ink font-semibold">detects every defect</span>, <span className="text-ink font-semibold">measures roll dimensions</span>, and <span className="text-ink font-semibold">certifies fabric quality</span> in real time.
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
-                Zero defect <span className="text-accent font-bold">escapes</span>
+                Detects every <span className="text-accent font-bold">defect</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                Sub-millimetre <span className="text-accent font-bold">precision</span>
+                Measures roll <span className="text-accent font-bold">dimensions</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                Automated 4-point <span className="text-accent font-bold">grading</span>
+                Certifies fabric <span className="text-accent font-bold">quality</span>
               </span>
             </div>
           </motion.div>
