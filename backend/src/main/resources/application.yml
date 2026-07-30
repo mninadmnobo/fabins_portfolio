@@ -95,7 +95,7 @@ spring:
 
 server:
   # PaaS platforms inject the port they expect the container to listen on.
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:${SERVER_PORT:8080}}
   error:
     # Suppress the default Whitelabel error body. Every error response is
     # produced by GlobalExceptionHandler as RFC 9457 problem+json instead.
