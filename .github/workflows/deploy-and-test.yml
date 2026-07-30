@@ -1,0 +1,223 @@
+# =============================================================================
+# FABINS — Continuous Integration & Deployment
+#
+#   validate-backend   Maven build + JUnit suite on Temurin JDK 21
+#   validate-frontend  TypeScript type-check + Next.js production build, Node 20
+#   deploy             Triggers Render (API) and Vercel (site), main branch only
+#
+# The two validate jobs run in parallel; deploy waits for both, so a red build
+# can never reach production. Target wall-clock time is under two minutes,
+# which is what the caching below is for.
+#
+# ── REQUIRED REPOSITORY SECRETS ─────────────────────────────────────────────
+# Settings → Secrets and variables → Actions. Both are optional: a missing
+# secret skips its deploy step rather than failing the run, so a fork or a
+# fresh clone still gets working CI.
+#
+#   RENDER_DEPLOY_HOOK_URL   Render dashboard → service → Settings → Deploy Hook
+#   VERCEL_DEPLOY_HOOK_URL   Vercel dashboard → project → Settings → Git →
+#                            Deploy Hooks → create one for `main`
+#
+# Both URLs contain their own credential — treat them as passwords and never
+# echo them into the log. See docs/CICD_AND_DEPLOYMENT.md §5.
+# =============================================================================
+
+name: Deploy & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Lets a deploy be re-run from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+# A second push to the same branch cancels the first run still in flight.
+# Without this, two deploys can race and the older commit can land last.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: nothing here writes to the repository.
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # BACKEND — compile and test the Spring Boot service
+  # ---------------------------------------------------------------------------
+  validate-backend:
+    name: Backend · JDK 21 build & tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # `cache: maven` handles ~/.m2/repository for us — keying on the hash of
+      # every pom.xml and restoring on partial matches. A hand-rolled
+      # actions/cache step for the same directory would only duplicate it.
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # The wrapper loses its executable bit on a Windows checkout; git stores
+      # the mode but not every commit path preserves it.
+      - name: Make the Maven wrapper executable
+        run: chmod +x mvnw
+
+      # -B  batch mode: no ANSI progress spinner, so the log stays readable
+      # -ntp suppresses the per-artifact download lines
+      - name: Run the test suite
+        run: ./mvnw -B -ntp test
+
+      # Tests already ran; -DskipTests keeps this from running them twice.
+      - name: Package the executable jar
+        run: ./mvnw -B -ntp package -DskipTests
+
+      # Kept for 7 days so a failing deploy can be compared against the exact
+      # artifact CI produced, rather than a rebuild.
+      - name: Upload the jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabins-api-jar
+          path: backend/target/fabins-api.jar
+          retention-days: 7
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # FRONTEND — type-check and production-build the Next.js site
+  # ---------------------------------------------------------------------------
+  validate-frontend:
+    name: Frontend · Node 20 lint & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # This project uses pnpm — pnpm-lock.yaml is the committed lockfile and
+      # there is no package-lock.json. pnpm must be installed BEFORE setup-node,
+      # because `cache: pnpm` below shells out to `pnpm store path`.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      # --frozen-lockfile fails rather than silently resolving new versions if
+      # package.json and the lockfile have drifted apart. CI must build exactly
+      # what a developer built.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Next's incremental compiler cache. Restoring it turns a full rebuild
+      # into an incremental one and is the single biggest saving in this job.
+      # The key includes a hash of the source so a code change gets a fresh
+      # entry, while restore-keys still reuses the previous build's cache.
+      - name: Restore the Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: frontend/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('frontend/pnpm-lock.yaml') }}-${{ hashFiles('frontend/**/*.[jt]s', 'frontend/**/*.[jt]sx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('frontend/pnpm-lock.yaml') }}-
+
+      # `lint` is `tsc --noEmit` (see package.json) — a strict type-check across
+      # the whole project, which `next build` alone does not guarantee to cover.
+      - name: Type-check
+        run: pnpm run lint
+
+      - name: Production build
+        run: pnpm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          # Compile-time value only. Vercel builds with its own environment
+          # variable; this placeholder just keeps the CI build deterministic.
+          NEXT_PUBLIC_API_BASE_URL: https://fabins-api.onrender.com
+
+  # ---------------------------------------------------------------------------
+  # DEPLOY — fire both platform hooks once everything is green
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Render & Vercel
+    needs: [validate-backend, validate-frontend]
+    # Never deploy from a pull request: `needs` only guarantees the checks
+    # passed, not that the code was reviewed and merged.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+
+    # The hooks are lifted into JOB-LEVEL env, and every step below tests
+    # `env.…` rather than `secrets.…`.
+    #
+    # This is not a style choice. GitHub does not expose the `secrets` context
+    # to a step's `if` — the documented contexts there are github, needs,
+    # strategy, matrix, job, runner, env, vars, steps and inputs. Writing
+    # `if: ${{ secrets.FOO != '' }}` fails workflow validation with
+    # "Unrecognized named-value: 'secrets'" and the whole run is rejected before
+    # any job starts. (`run:` *can* read secrets directly — it is `if:` that
+    # cannot, which is an easy asymmetry to trip over.)
+    #
+    # A step's `if` can read job-level env, which is what makes this work. Note
+    # it cannot read env declared in that same step's own `env:` block.
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+
+    steps:
+      # Render pulls and builds from GitHub itself, so the hook is a bare POST
+      # with no payload. --fail turns an HTTP error into a non-zero exit;
+      # without it curl reports success on a 404.
+      #
+      # The `if` is what makes the secret optional: no secret, no deploy step,
+      # and CI stays green on a fork.
+      - name: Trigger the Render backend deploy
+        if: ${{ env.RENDER_DEPLOY_HOOK_URL != '' }}
+        run: curl --fail --silent --show-error --location -X POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Trigger the Vercel frontend deploy
+        if: ${{ env.VERCEL_DEPLOY_HOOK_URL != '' }}
+        run: curl --fail --silent --show-error --location -X POST "$VERCEL_DEPLOY_HOOK_URL"
+
+      # Both hooks return as soon as the platform queues the build, so a green
+      # job here means "deploy accepted", not "deploy finished". Watch the
+      # platform dashboards for the outcome.
+      #
+      # The values are tested in shell rather than interpolated into the script,
+      # so a hook URL is never expanded into a command line where it could be
+      # captured by `set -x` or a crash dump.
+      - name: Summarise
+        run: |
+          status() { [ -n "$1" ] && echo "yes" || echo "no — step skipped"; }
+          {
+            echo "### Deploy triggered"
+            echo ""
+            echo "| Target | Platform | Hook configured |"
+            echo "| --- | --- | --- |"
+            echo "| Backend | Render | $(status "$RENDER_DEPLOY_HOOK_URL") |"
+            echo "| Frontend | Vercel | $(status "$VERCEL_DEPLOY_HOOK_URL") |"
+            echo ""
+            echo "Commit \`${GITHUB_SHA:0:7}\`. Builds run on the platforms; check their dashboards for the result."
+          } >> "$GITHUB_STEP_SUMMARY"

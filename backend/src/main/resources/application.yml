@@ -2,15 +2,25 @@
 # FABINS API — base configuration
 #
 # These are the defaults for every environment. Profile-specific files override
-# them: application-dev.yml and application-prod.yml.
+# them: application-dev.yml, application-prod.yml, and (tests only)
+# src/test/resources/application-test.yml.
 #
 # Choose a profile with SPRING_PROFILES_ACTIVE=prod, or --spring.profiles.active=prod.
 # `dev` is the default (set below), so `./mvnw spring-boot:run` just works.
 #
-# PRECEDENCE (highest wins): environment variable > profile file > this file.
-# That is why every secret below is written as ${ENV_VAR:fallback} — the
+# PRECEDENCE (highest wins):
+#   command-line arg  >  system property  >  environment variable
+#                     >  application-<profile>.yml  >  this file
+#
+# That is why almost every value below is written as ${ENV_VAR:fallback}: the
 # fallback keeps local development frictionless, and the environment variable
-# takes over in production.
+# takes over in production. A value with NO fallback is intentional — it means
+# the application should refuse to start rather than run misconfigured.
+#
+# RELAXED BINDING: Spring maps the environment variable FABINS_BACKEND_URL onto
+# the property fabins.backend-url automatically (upper snake case → kebab case).
+# Both spellings therefore work, and the ${FABINS_BACKEND_URL:…} placeholders
+# below simply make the mapping explicit and self-documenting.
 # =============================================================================
 
 spring:
@@ -18,6 +28,8 @@ spring:
     name: fabins-api
 
   profiles:
+    # Applied when SPRING_PROFILES_ACTIVE is unset. Production containers set it
+    # to `prod` explicitly — see the Dockerfile.
     default: dev
 
   jpa:
@@ -34,20 +46,43 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  # --- SMTP transport (fallback email engine) --------------------------------
+  # Only used when the Brevo HTTPS REST engine is unavailable; see
+  # `fabins.mail.api-key` below and EmailServiceImpl for the engine selection.
+  #
+  # PORT 465 (SMTPS / implicit SSL) IS DELIBERATE. Brevo also listens on 587
+  # (STARTTLS), but most cloud PaaS providers block outbound 25/465/587 to fight
+  # spam — and they blackhole rather than reject, so a 587 connection hangs for
+  # the full socket timeout instead of failing fast. 465 is the variant most
+  # likely to survive; the REST engine is the one that always does.
   mail:
     host: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
     port: ${SPRING_MAIL_PORT:465}
+    # Brevo's SMTP login is NOT the sender address — it is the account-specific
+    # login shown on the Brevo SMTP & API page (e.g. b3c905001@smtp-brevo.com).
     username: ${SPRING_MAIL_USERNAME:b3c905001@smtp-brevo.com}
-    password: ${SPRING_MAIL_PASSWORD}
+    # Empty fallback on purpose: with no credential the app still boots and
+    # EmailServiceImpl logs messages instead of sending them.
+    password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
+          # Send the SMTP AUTH command. Without it Brevo rejects the session.
           auth: true
           ssl:
+            # Implicit SSL: the socket is encrypted from the first byte. This is
+            # what port 465 expects, as opposed to STARTTLS on 587 which opens
+            # in the clear and upgrades afterwards.
             enable: true
           socketFactory:
             port: 465
             class: javax.net.ssl.SSLSocketFactory
+        # Fail fast instead of occupying an async worker for minutes when the
+        # provider silently drops outbound SMTP traffic.
+        smtps:
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
 
   jackson:
     # Serialise Instant as ISO-8601 ("2026-07-27T18:30:00Z") rather than as an
@@ -59,6 +94,7 @@ spring:
     default-property-inclusion: non_null
 
 server:
+  # PaaS platforms inject the port they expect the container to listen on.
   port: ${SERVER_PORT:8080}
   error:
     # Suppress the default Whitelabel error body. Every error response is
@@ -85,24 +121,75 @@ springdoc:
     operations-sorter: alpha
 
 # --- Application settings -----------------------------------------------------
-# Bound to ApiProperties. Adding a key here means adding a field there.
+# Bound to ApiProperties. Adding a key here means adding a component there,
+# because records are bound by constructor and an unmatched component is null.
 fabins:
+  # ===========================================================================
+  # FUTURE CUSTOM DOMAIN INSTRUCTIONS — CORS
+  # ---------------------------------------------------------------------------
+  # These are the *browser* origins allowed to call the API. They are matched by
+  # SecurityConfig with setAllowedOriginPatterns(), so `https://*.vercel.app`
+  # style wildcards are legal here (setAllowedOrigins() would not allow them
+  # alongside allowCredentials(true)).
+  #
+  # When the site moves to, say, fabins.com:
+  #   1. Set FABINS_ALLOWED_ORIGIN=https://fabins.com on the Render service.
+  #      application-prod.yml reads exactly that variable.
+  #   2. If you also serve www., add it — an origin match is exact on scheme,
+  #      host AND port, so https://fabins.com does not cover
+  #      https://www.fabins.com.
+  #   3. Redeploy the backend. CORS is read at bean creation, not per request.
+  #   4. Leave the preview wildcard in place only if you want Vercel preview
+  #      deployments to keep working against production data.
+  # ===========================================================================
   cors:
-    # Exact origins allowed to call the API from a browser. The Next.js dev
-    # server runs on 3000. Add the production site origin before going live.
+    # Local development only — the Next.js dev server runs on 3000. Production
+    # origins live in application-prod.yml.
     allowed-origins:
       - http://localhost:3000
       - http://127.0.0.1:3000
 
+  # ===========================================================================
+  # FUTURE CUSTOM DOMAIN INSTRUCTIONS — BACKEND ORIGIN
+  # ---------------------------------------------------------------------------
+  # The public origin of THIS service. It is not used for serving requests; it
+  # is used to build absolute links that are embedded in outgoing emails (the
+  # one-click acknowledge button). An email client has no notion of the server's
+  # own origin, so a relative link there is dead.
+  #
+  # When attaching api.fabins.com to the Render service:
+  #   1. Set FABINS_BACKEND_URL=https://api.fabins.com on the Render service.
+  #   2. Redeploy. Links in emails sent from that point on use the new host.
+  #   3. Keep the old onrender.com host resolvable for a while — links already
+  #      delivered to inboxes still point at it.
+  # No trailing slash; EmailServiceImpl strips one defensively regardless.
+  # ===========================================================================
+  backend-url: ${FABINS_BACKEND_URL:http://localhost:8080}
+
   admin:
     username: ${FABINS_ADMIN_USERNAME:admin}
-    # Development-only default. The prod profile removes it so that a missing
-    # environment variable fails the boot rather than shipping a known password.
+    # Development-only default, overridden in application-prod.yml.
     password: ${FABINS_ADMIN_PASSWORD:change-me-in-production}
 
   mail:
+    # Internal recipient — where new-enquiry alerts land.
     admin-address: ${FABINS_ADMIN_ADDRESS:saturn.rnd.innovation@gmail.com}
+    # Envelope sender. MUST be a verified sender in the Brevo account, otherwise
+    # the REST API answers HTTP 400 and SMTP answers 550.
     from-address: ${SPRING_MAIL_FROM:saturn.rnd.innovation@gmail.com}
+    # Display name shown beside the address in the recipient's inbox, i.e.
+    # "Saturn Textiles R&D <saturn.rnd.innovation@gmail.com>".
+    sender-name: ${FABINS_MAIL_SENDER_NAME:Saturn Textiles R&D}
+    # Credential for the primary (HTTPS REST) engine. A Brevo key starts with
+    # `xsmtpsib-`; anything else — or blank — makes EmailServiceImpl skip the
+    # REST engine and use SMTP. Defaults to the SMTP password because Brevo
+    # issues one key that serves both transports, so a single deployment
+    # variable is enough. Set BREVO_API_KEY only if you want them separated.
+    api-key: ${BREVO_API_KEY:${SPRING_MAIL_PASSWORD:}}
+    # Subject templates. The %s is filled by EmailServiceImpl:
+    #   admin           → mill name
+    #   sender          → reference code (FAB-2026-XXXXXXXX)
+    #   acknowledgement → reference code
     admin-subject: "[FABINS Alert] New Deployment Enquiry: %s"
     sender-subject: "FABINS Deployment Assessment Request Received — Ref: %s"
     acknowledgement-subject: "[Acknowledged] FABINS Deployment Request — Ref: %s"

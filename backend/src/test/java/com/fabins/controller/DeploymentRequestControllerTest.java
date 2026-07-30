@@ -1,6 +1,7 @@
 package com.fabins.controller;
 
 import com.fabins.dto.request.CreateDeploymentRequest;
+import com.fabins.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>{@code @Transactional} rolls each test back afterwards, so tests cannot
  * see each other's rows and can run in any order.
  */
-import com.fabins.service.EmailService;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -51,7 +50,12 @@ class DeploymentRequestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    /**
+     * Replaced with a mock so the suite never opens a network connection to a
+     * mail provider. {@code @MockitoBean} is the Spring Framework 6.2 successor
+     * to Spring Boot's deprecated {@code @MockBean}.
+     */
+    @MockitoBean
     private EmailService emailService;
 
     private MockMvc mockMvc;

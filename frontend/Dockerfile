@@ -9,8 +9,10 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install libc6-compat for alpine compatibility with native modules if needed
-RUN apk add --no-libc6-compat libc6-compat
+# glibc shim — some native Node modules are built against glibc and will not
+# load on Alpine's musl without it. --no-cache skips writing the package index
+# to the image layer.
+RUN apk add --no-cache libc6-compat
 
 # Copy package descriptors first to leverage Docker layer caching
 COPY package.json pnpm-lock.yaml* package-lock.json* yarn.lock* ./

@@ -58,18 +58,21 @@ fabins_portfolio/
 │   ├── app/                  # App Router: layout, page, globals.css tokens
 │   ├── components/           # UI Primitives, Sections, Layout Shell
 │   ├── lib/                  # Data fixtures, Selectors (DAL), API boundary
-│   └── types/                # Strict domain model TypeScript interfaces
+│   └── public/               # Static assets — logos, photography, favicon
 │
 ├── backend/                  # Spring Boot 3.4 REST API Service
 │   ├── src/main/java/        # Controllers, Services, Repositories, Entities, DTOs
-│   ├── src/main/resources/   # application.yml configuration & database schemas
+│   ├── src/main/resources/   # application.yml config, Flyway migrations, email templates
+│   ├── src/test/java/        # JUnit 5 suite — endpoint, security, and email tests
 │   ├── pom.xml               # Maven dependencies & build configuration
 │   └── mvnw / mvnw.cmd       # Cross-platform Maven Wrappers
+│
+├── .github/workflows/        # ⚙️ CI/CD — build, test, and deploy pipeline
 │
 └── docs/                     # 📚 Central Documentation & Learning Guides
     ├── FRONTEND_ARCHITECTURE_GUIDE.md  # Complete React/Next.js learning guide
     ├── BACKEND_LEARNING_GUIDE.md       # Complete Spring Boot & JPA learning guide
-    └── SYSTEM_SPECIFICATION.md         # FABINS industrial optical specification
+    └── CICD_AND_DEPLOYMENT.md          # Deployment, custom domains, lessons learned
 ```
 
 ---
@@ -77,6 +80,7 @@ fabins_portfolio/
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
+
 * **Node.js**: v20.0+ and `pnpm` (or `npm`)
 * **Java JDK**: Version 21
 
@@ -128,6 +132,7 @@ This repository was specifically built as a **flagship educational reference** f
 
 * 📖 **[Frontend Architecture Guide](docs/FRONTEND_ARCHITECTURE_GUIDE.md)**: Teaches clean 3-layer React architecture, state composition, data selectors, and custom design primitives.
 * ☕ **[Spring Boot Learning Guide](docs/BACKEND_LEARNING_GUIDE.md)**: Line-by-line explanation of Spring Boot annotations, Controller-Service-Repository patterns, DTO mapping, and RFC 9457 error handling.
+* 🚀 **[CI/CD & Deployment Guide](docs/CICD_AND_DEPLOYMENT.md)**: Production topology, the GitHub Actions pipeline, custom domain setup (DNS, CORS, SPF/DKIM/DMARC), and the two deployment failures that cost the most time to diagnose — cloud PostgreSQL URL parsing and PaaS SMTP port blocking.
 
 ---
 
@@ -136,9 +141,10 @@ This repository was specifically built as a **flagship educational reference** f
 | Method | Endpoint Path | Access | Purpose |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/v1/deployment-requests` | **Public** | Submit deployment assessment request from website form |
+| `GET` `POST` | `/api/v1/deployment-requests/{id}/acknowledge` | **Public** | One-click acknowledge link embedded in the R&D notification email — moves the request to `IN_REVIEW` and notifies the sender |
 | `GET` | `/api/v1/deployment-requests` | Admin | List deployment requests (paginated, filterable by status) |
 | `GET` | `/api/v1/deployment-requests/{id}` | Admin | Retrieve details of a specific deployment request |
-| `PATCH` | `/api/v1/deployment-requests/{id}/status` | Admin | Update request status (`PENDING` ➔ `APPROVED` / `REJECTED`) |
+| `PATCH` | `/api/v1/deployment-requests/{id}/status` | Admin | Update request status (`NEW` ➔ `IN_REVIEW` ➔ `CONTACTED` ➔ `CLOSED`) |
 
 ---
 

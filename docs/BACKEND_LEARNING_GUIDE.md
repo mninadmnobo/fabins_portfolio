@@ -50,12 +50,15 @@ Here is a complete breakdown of every directory and file in the backend reposito
 ### 1. Root & Build Infrastructure
 
 #### 📄 `pom.xml` (Project Object Model)
+
 * **Why it exists**: The central build configuration file for **Apache Maven**. It defines project dependencies (Spring Web, Spring Data JPA, Spring Security, Validation, Lombok, MapStruct, H2 Database, Swagger/OpenAPI) and Java 21 compiler settings.
 
 #### 🛠️ `mvnw`, `mvnw.cmd`, `.mvn/` (Maven Wrapper)
+
 * **Why it exists**: Allows running Maven commands (`./mvnw spring-boot:run`) on any machine without needing Maven pre-installed. `mvnw` runs on Linux/macOS and `mvnw.cmd` runs on Windows PowerShell/CMD.
 
 #### ⚙️ `src/main/resources/application.yml`
+
 * **Why it exists**: The main configuration file for Spring Boot (server port 8080, database connection string, JPA settings).
 
 ---
@@ -63,6 +66,7 @@ Here is a complete breakdown of every directory and file in the backend reposito
 ### 2. Main Entry Point (`src/main/java/com/fabins/`)
 
 #### 🚀 `FabinsApplication.java`
+
 * **Why it exists**: Annotated with `@SpringBootApplication`. Boots up the embedded Tomcat server and initiates Spring Component Scanning.
 
 ---
@@ -70,6 +74,7 @@ Here is a complete breakdown of every directory and file in the backend reposito
 ### 3. Controller Layer (`com.fabins.controller`)
 
 #### 🌐 `DeploymentRequestController.java`
+
 * **Why it exists**: Annotated with `@RestController`. Exposes REST API endpoints (`POST`, `GET`, `PATCH`).
 
 ---

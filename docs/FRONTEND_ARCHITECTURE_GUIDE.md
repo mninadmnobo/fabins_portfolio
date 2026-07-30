@@ -57,9 +57,11 @@ Everything in this repository flows in **one direction**:
 All content is decoupled from UI components. You never need to touch TSX component markup to update site copy or specifications.
 
 ### 1. Changing Problem Cards (`ProblemSection`)
+
 * **File**: `frontend/lib/data/fabins-system.ts`
 * **Target Property**: `FABINS_SYSTEM_DATA.problemItems`
 * **Example Modification**:
+
   ```typescript
   {
     id: 'manual',
@@ -70,14 +72,17 @@ All content is decoupled from UI components. You never need to touch TSX compone
   ```
 
 ### 2. Changing Strategy / Comparison Table (`AboutSection`)
+
 * **File**: `frontend/lib/data/fabins-system.ts`
 * **Target Property**: `FABINS_SYSTEM_DATA.aboutComparisons`
 
 ### 3. Changing Vision Pipeline Steps or Hardware Specs (`SystemSection`)
+
 * **File**: `frontend/lib/data/fabins-system.ts`
 * **Target Properties**: `FABINS_SYSTEM_DATA.pipelineSteps` & `FABINS_SYSTEM_DATA.hardwarePillars`
 
 ### 4. Changing Innovator & Team Profiles (`InnovatorsSection`)
+
 * **File**: `frontend/lib/data/innovators.ts`
 * **Target Array**: `fabinsInnovators`
 
@@ -97,6 +102,7 @@ alert('Success!')
 ```
 
 **What happens when the 3-line approach fails in real life?**
+
 1. **Server takes 30 seconds to respond?** The UI freezes forever with no feedback.
 2. **User's Wi-Fi drops or backend server is down?** Uncaught `TypeError: Failed to fetch` crashes the React app.
 3. **Backend validation fails (e.g. invalid email format)?** The user sees a raw JSON `{"title": "Constraint Violation"}` instead of a clean, friendly error message.

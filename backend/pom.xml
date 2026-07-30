@@ -118,6 +118,17 @@
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+      Already pulled in transitively by spring-boot-starter-test. Declared
+      explicitly so that surefire can resolve ${org.mockito:mockito-core:jar}
+      below and attach Mockito as a proper Java agent — see the surefire block.
+    -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -142,6 +153,38 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <parameters>true</parameters>
+        </configuration>
+      </plugin>
+
+      <!--
+        Attaches Mockito's byte-buddy agent up front rather than letting it
+        self-attach at runtime. Self-attachment still works on Java 21 but
+        prints a "Dynamic loading of agents will be disallowed" warning on every
+        test run and is scheduled to stop working in a future JDK.
+
+        -Xshare:off disables class-data sharing, which cannot be used once an
+        agent appends to the bootstrap classpath and otherwise warns about it.
+      -->
+      <!-- Exposes each dependency's resolved path as a ${groupId:artifactId:type}
+           property, which is what lets surefire below point -javaagent at the
+           Mockito jar without hardcoding a version or a local repository path. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
         </configuration>
       </plugin>
     </plugins>

@@ -12,10 +12,28 @@ import { fadeUpProps } from '@/lib/animations'
  * CONTACT SECTION — the deployment-request form.
  *
  * ─── WHERE THE DATA GOES ────────────────────────────────────────────────────
- * Nowhere yet. Submitting calls `submitDeploymentRequest` in
- * `lib/api/contact.ts`, which is currently a stub. This component is already
- * written against the real contract — it handles pending, success, and failure
- * — so connecting the backend means editing that one file and nothing here.
+ * Submitting calls `submitDeploymentRequest` in `lib/api/contact.ts`, which
+ * POSTs to the Spring Boot API at `/api/v1/deployment-requests`. The backend
+ * records the enquiry and dispatches two emails asynchronously. This component
+ * knows none of that: it only needs the `{ ok }` result, so changing transport
+ * or moving to a server action means editing that one file and nothing here.
+ *
+ * ─── COLD STARTS ────────────────────────────────────────────────────────────
+ * The API runs on Render's free tier, which suspends a service after ~15
+ * minutes of inactivity and takes roughly 30-50 seconds to boot the JVM again
+ * on the next request. The first visitor after a quiet period therefore waits
+ * far longer than the others.
+ *
+ * Two things follow from that, and both are deliberate:
+ *   • `lib/api/contact.ts` sets a 60s request timeout rather than the usual
+ *     10-15s, so a cold start resolves as a slow success instead of a spurious
+ *     "request timed out" on a submission the backend actually accepted.
+ *   • The `sending` state must stay visibly pending for that whole window —
+ *     hence a disabled `fieldset` and a changed button label, not a spinner
+ *     that a visitor might read as a hang. Do not add a client-side timeout
+ *     shorter than the one in the API module.
+ * Moving the backend to a paid always-on plan is what removes this; when that
+ * happens the timeout can safely drop back to ~15s.
  *
  * ─── FORM STATE ─────────────────────────────────────────────────────────────
  * `status` drives which of three views is rendered:
@@ -57,6 +75,9 @@ export const ContactSection = () => {
     setStatus('sending')
     setErrorMessage(null)
 
+    // Can legitimately take up to 60s on a cold backend — see the note at the
+    // top of this file. `submitDeploymentRequest` never throws, so there is no
+    // try/catch here and no path that leaves the form stuck in 'sending'.
     const result = await submitDeploymentRequest(formData)
 
     if (result.ok) {

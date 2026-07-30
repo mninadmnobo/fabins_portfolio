@@ -7,6 +7,17 @@ const nextConfig = {
   reactStrictMode: true,
 
   /**
+   * Emits `.next/standalone`, a self-contained server bundling only the
+   * node_modules actually reached at runtime. This is what the Dockerfile's
+   * final stage copies, and it is the difference between a ~120 MB image and
+   * one carrying the entire dependency tree.
+   *
+   * Vercel uses its own output format and ignores this, so it is safe to leave
+   * enabled for both deployment targets.
+   */
+  output: 'standalone',
+
+  /**
    * Hosts allowed to load the dev server's assets when it is reached over the
    * local network — for example, opening the site on a phone to check the
    * responsive layout.
@@ -16,13 +27,6 @@ const nextConfig = {
    * macOS/Linux), or delete the option entirely if you only ever use localhost.
    * It is a development-only setting and is ignored in production.
    */
-  /**
-   * Automatically leverages output trace features to create a standalone build
-   * folder that includes only the necessary node_modules for production, drastically
-   * reducing Docker container image size.
-   */
-  output: 'standalone',
-
   allowedDevOrigins: ['192.168.68.103', '192.168.68.103:3000'],
 }
 

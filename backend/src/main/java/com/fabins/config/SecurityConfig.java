@@ -139,32 +139,64 @@ public class SecurityConfig {
     /**
      * Browser origin rules, driven by {@code fabins.cors.allowed-origins}.
      *
-     * <p>This is what allows the Next.js frontend on a different port to call
+     * <p>This is what allows the Next.js frontend on a different origin to call
      * the API. Without it the browser blocks the response — note that CORS is a
      * browser-enforced policy, so it is not a substitute for authentication;
      * anything outside a browser ignores it entirely.
+     *
+     * <h2>Patterns, not exact origins</h2>
+     * {@code setAllowedOriginPatterns} is used rather than
+     * {@code setAllowedOrigins}. The two differ in one decisive way: the
+     * CORS specification forbids answering a credentialed request with
+     * {@code Access-Control-Allow-Origin: *}, so Spring rejects the combination
+     * of {@code setAllowedOrigins("*")} and {@code setAllowCredentials(true)} at
+     * startup. Patterns sidestep that by matching the incoming {@code Origin}
+     * header and echoing it back verbatim, which is both legal and safer than a
+     * wildcard because the response names exactly one origin.
+     *
+     * <p>The practical payoff is that a configured value may contain a wildcard
+     * segment — {@code https://*.vercel.app} keeps every Vercel preview
+     * deployment working without redeploying the API for each one, and
+     * {@code https://fabins.com} still behaves as an exact match. Matching is on
+     * the full origin, so scheme, host and port must all agree:
+     * {@code https://fabins.com} does <em>not</em> cover
+     * {@code https://www.fabins.com}, and {@code http://} does not cover
+     * {@code https://}. List both when both are served.
+     *
+     * <h2>Custom domain checklist</h2>
+     * Set {@code FABINS_ALLOWED_ORIGIN} on the platform to the new site origin
+     * and redeploy — this bean is built once at startup, so a change to the
+     * variable does nothing until the service restarts. See the annotated block
+     * in {@code application-prod.yml} for the full procedure.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
+        // An empty list would otherwise mean "no origin may call the API",
+        // which in a fresh deployment looks exactly like a broken frontend.
+        // Falling back to "*" keeps the site working; every real environment
+        // sets the list explicitly.
         List<String> origins = properties.cors().allowedOrigins();
-        if (origins != null && !origins.isEmpty()) {
-            configuration.setAllowedOriginPatterns(origins);
-        } else {
-            configuration.setAllowedOriginPatterns(List.of("*"));
-        }
-        
+        configuration.setAllowedOriginPatterns(
+                origins != null && !origins.isEmpty() ? origins : List.of("*"));
+
+        // OPTIONS is listed for clarity — it is the preflight method and Spring
+        // handles it regardless. PUT and DELETE are absent because no endpoint
+        // uses them; a method not listed here is refused by the browser.
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
 
-        // Lets the frontend read the Location header returned by POST.
+        // Response headers are hidden from JavaScript unless exposed. This one
+        // carries the URL of the newly created request returned by POST.
         configuration.setExposedHeaders(List.of("Location"));
 
-        // Required for the browser to send the Authorization header.
+        // Required for the browser to send the Authorization header on the
+        // admin endpoints. See the note above on why this forces patterns.
         configuration.setAllowCredentials(true);
 
-        // Cache preflight results for an hour to cut round-trips.
+        // Cache the preflight result for an hour, so a visitor filling in the
+        // contact form does not pay for an extra round-trip on submit.
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -56,9 +56,16 @@ services:
       FABINS_ADMIN_USERNAME: ${FABINS_ADMIN_USERNAME:-admin}
       FABINS_ADMIN_PASSWORD: ${FABINS_ADMIN_PASSWORD:-admin123}
       FABINS_ALLOWED_ORIGIN: ${FABINS_ALLOWED_ORIGIN:-http://localhost:3000}
+      # Origin used to build acknowledge links inside emails. Points at the
+      # host's published port, not the container's, because the link is opened
+      # from a mail client outside the Compose network.
+      FABINS_BACKEND_URL: ${FABINS_BACKEND_URL:-http://localhost:8080}
+      # 465 (implicit SSL), matching application.yml. The REST engine takes over
+      # whenever SPRING_MAIL_PASSWORD is a Brevo key; blank means emails are
+      # logged rather than sent, which is the default here.
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp-relay.brevo.com}
-      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
-      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-saturn.rnd.innovation@gmail.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-b3c905001@smtp-brevo.com}
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
     ports:
       - "8080:8080"
@@ -83,7 +90,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8080/api/v1}
+      # Origin only. The browser resolves this, not the container, so it must be
+      # the host-published address rather than the `backend` service name.
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8080}
     ports:
       - "3000:3000"
 

@@ -12,13 +12,26 @@
  * require credentials and are deliberately never called from the browser.
  *
  * ─── CONFIGURATION ──────────────────────────────────────────────────────────
- * Set the API origin in `frontend/.env.local`:
+ * Set the API origin in `frontend/.env.local` for local work, and in the
+ * Vercel project's environment variables for deployments:
  *
- *   NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ *   local        NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ *   production   NEXT_PUBLIC_API_BASE_URL=https://fabins-api.onrender.com
+ *   custom domain NEXT_PUBLIC_API_BASE_URL=https://api.fabins.com
+ *
+ * Origin only — no `/api/v1`, no trailing slash. Both are stripped below if
+ * present, but the canonical form is the bare origin.
+ *
+ * Changing it on Vercel requires a redeploy: `NEXT_PUBLIC_` values are inlined
+ * into the bundle at build time, not read at runtime.
  *
  * The `NEXT_PUBLIC_` prefix is required for the value to be readable in the
  * browser. It is therefore visible to anyone who views the page — never put a
  * secret in a `NEXT_PUBLIC_` variable.
+ *
+ * Whatever origin is set here must also appear in `FABINS_ALLOWED_ORIGIN` on
+ * the backend, or the browser will block the response. See
+ * `docs/CICD_AND_DEPLOYMENT.md` §4.
  */
 
 /** The payload collected by the deployment-request form. */
@@ -56,15 +69,32 @@ interface ProblemDetail {
   errors?: Record<string, string>
 }
 
-/** Origin of the API. Normalises trailing slashes and handles accidental `/api/v1` suffixes. */
-const rawApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
-let cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
-if (cleanApiUrl.endsWith('/api/v1')) {
-  cleanApiUrl = cleanApiUrl.slice(0, -'/api/v1'.length)
-}
-const API_BASE_URL = cleanApiUrl
+/**
+ * Origin of the API — scheme and host only, no path.
+ *
+ * The value is normalised rather than trusted verbatim, because the two
+ * mistakes people actually make when filling in a dashboard field are a
+ * trailing slash and pasting the full endpoint. Both would otherwise produce a
+ * 404 against `…//api/v1/…` or `…/api/v1/api/v1/…`.
+ *
+ * NOTE: `process.env.NEXT_PUBLIC_*` is inlined at build time, not read at
+ * runtime. Changing it on Vercel therefore requires a redeploy, not a restart.
+ */
+const API_BASE_URL: string = (() => {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
+  const withoutTrailingSlash = raw.trim().replace(/\/+$/, '')
+  return withoutTrailingSlash.replace(/\/api\/v1$/, '')
+})()
 
-/** Give up on a request that has not responded in this long (60s to allow for Render free-tier cold starts). */
+/**
+ * Give up on a request that has not answered in this long.
+ *
+ * 60s, not the 10-15s that would be normal, because the API is on Render's
+ * free tier: an idle service is suspended and the next request pays for a full
+ * JVM cold start, typically 30-50s. A shorter timeout would abort submissions
+ * the backend went on to accept, and the visitor would see a failure for an
+ * enquiry that was in fact recorded. See the note in `ContactSection.tsx`.
+ */
 const REQUEST_TIMEOUT_MS = 60_000
 
 /** Shown when the server fails in a way we have no specific message for. */
@@ -132,18 +162,18 @@ async function readErrorMessage(response: Response): Promise<string> {
   let problem: ProblemDetail | null = null
 
   try {
-    problem = (await response.json()) as ProblemDetail
+    // Parsed as `unknown` and narrowed, rather than asserted with `as`. An
+    // error from a proxy or CDN is not necessarily an object at all, and an
+    // unchecked cast would turn that into a runtime crash on `.errors`.
+    problem = asProblemDetail(await response.json())
   } catch {
     // Not JSON — fall through to the status-based message below.
   }
 
   // Validation failure: show the first field message, which is far more useful
   // than the generic "One or more fields are invalid".
-  const fieldErrors = problem?.errors
-  if (fieldErrors) {
-    const firstMessage = Object.values(fieldErrors)[0]
-    if (firstMessage) return firstMessage
-  }
+  const firstFieldError = problem?.errors && Object.values(problem.errors)[0]
+  if (firstFieldError) return firstFieldError
 
   if (problem?.detail) return problem.detail
 
@@ -153,4 +183,33 @@ async function readErrorMessage(response: Response): Promise<string> {
   }
 
   return GENERIC_ERROR
+}
+
+/**
+ * Narrows a parsed JSON body to `ProblemDetail`, keeping only the fields whose
+ * types actually check out.
+ *
+ * `response.json()` is typed `any` by the DOM lib, which is the one hole strict
+ * mode does not close. Everything reaching this function comes from the
+ * network, so each field is verified rather than assumed.
+ */
+function asProblemDetail(body: unknown): ProblemDetail | null {
+  if (typeof body !== 'object' || body === null) return null
+
+  const { title, detail, errors } = body as Record<string, unknown>
+
+  return {
+    title: typeof title === 'string' ? title : undefined,
+    detail: typeof detail === 'string' ? detail : undefined,
+    errors: isStringRecord(errors) ? errors : undefined,
+  }
+}
+
+/** True when every value in the object is a string, as the API contract promises. */
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.values(value).every((entry) => typeof entry === 'string')
+  )
 }

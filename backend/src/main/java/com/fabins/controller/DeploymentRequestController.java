@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,11 +23,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -148,10 +151,20 @@ public class DeploymentRequestController {
 
     /**
      * Acknowledges a request and dispatches an acknowledgement email to the sender.
-     * Publicly accessible via GET to support 1-click email link acknowledgment.
+     *
+     * <p>Public and reachable by GET, because it is invoked by clicking a link
+     * in the notification email — an email client cannot issue a POST. POST is
+     * accepted too so that a future admin UI can call it properly.
+     *
+     * <p>Declared as one {@code @RequestMapping} listing both methods rather
+     * than as {@code @GetMapping} plus {@code @PostMapping} on the same method:
+     * Spring merges only one {@code @RequestMapping} meta-annotation per
+     * handler, so the second of the two would be silently discarded.
+     *
+     * <p>Returns HTML rather than JSON because the response is rendered in the
+     * clicker's browser tab, not consumed by code.
      */
-    @GetMapping("/{id}/acknowledge")
-    @PostMapping("/{id}/acknowledge")
+    @RequestMapping(value = "/{id}/acknowledge", method = {RequestMethod.GET, RequestMethod.POST})
     @Operation(summary = "Acknowledge a deployment request and notify sender")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Request acknowledged and notification sent"),
@@ -175,8 +188,10 @@ public class DeploymentRequestController {
             </body>
             </html>
             """.formatted(response.referenceCode(), response.millName(), response.email());
+        // Charset is explicit: a mill name containing non-ASCII characters would
+        // otherwise be decoded as ISO-8859-1 by the browser.
         return ResponseEntity.ok()
-                .contentType(org.springframework.http.MediaType.parseMediaType("text/html;charset=UTF-8"))
+                .contentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8))
                 .body(htmlResponse);
     }
 }
