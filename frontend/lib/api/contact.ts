@@ -56,11 +56,16 @@ interface ProblemDetail {
   errors?: Record<string, string>
 }
 
-/** Origin of the API. Falls back to the backend's default local port. */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
+/** Origin of the API. Normalises trailing slashes and handles accidental `/api/v1` suffixes. */
+const rawApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
+let cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
+if (cleanApiUrl.endsWith('/api/v1')) {
+  cleanApiUrl = cleanApiUrl.slice(0, -'/api/v1'.length)
+}
+const API_BASE_URL = cleanApiUrl
 
-/** Give up on a request that has not responded in this long. */
-const REQUEST_TIMEOUT_MS = 10_000
+/** Give up on a request that has not responded in this long (60s to allow for Render free-tier cold starts). */
+const REQUEST_TIMEOUT_MS = 60_000
 
 /** Shown when the server fails in a way we have no specific message for. */
 const GENERIC_ERROR = 'Could not send your request. Please try again.'
