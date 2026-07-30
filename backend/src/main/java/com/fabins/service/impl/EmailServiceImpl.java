@@ -77,7 +77,14 @@ public class EmailServiceImpl implements EmailService {
         String fromEmail = apiProperties.mail().fromAddress();
         String refCode = request.getReferenceCode();
         String subject = String.format(apiProperties.mail().adminSubject(), request.getMillName());
-        String acknowledgeUrl = "http://localhost:8080/api/v1/deployment-requests/" + request.getId() + "/acknowledge";
+        String backendUrl = System.getenv("FABINS_BACKEND_URL");
+        if (backendUrl == null || backendUrl.isBlank()) {
+            backendUrl = System.getProperty("FABINS_BACKEND_URL", "https://fabins-api.onrender.com");
+        }
+        if (backendUrl.endsWith("/")) {
+            backendUrl = backendUrl.substring(0, backendUrl.length() - 1);
+        }
+        String acknowledgeUrl = backendUrl + "/api/v1/deployment-requests/" + request.getId() + "/acknowledge";
 
         String template = loadTemplate("templates/email/admin-notification.html");
         String content = template
