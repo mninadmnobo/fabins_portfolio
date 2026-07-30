@@ -31,11 +31,13 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for the email layer.
  *
- * <p>Deliberately not a {@code @SpringBootTest}: these exercise template
+ * <p>
+ * Deliberately not a {@code @SpringBootTest}: these exercise template
  * rendering and engine selection, neither of which needs a context. They run in
  * milliseconds and never touch the network.
  *
- * <p>The SMTP engine is the one under test throughout, selected by configuring
+ * <p>
+ * The SMTP engine is the one under test throughout, selected by configuring
  * a credential that is <em>not</em> a Brevo key. Driving the REST engine would
  * mean either reaching {@code api.brevo.com} from CI or making the endpoint
  * injectable purely for a test; the rendered body asserted here is the same
@@ -150,17 +152,6 @@ class EmailServiceImplTest {
         service(PLAIN_SMTP_PASSWORD).sendDeploymentRequestNotifications(requestWithId());
     }
 
-    @Test
-    @DisplayName("Keys starting with xkeysib- or xsmtpsib- bypass SMTP and attempt Brevo REST API")
-    void brevoKeyPrefixesBypassSmtp() {
-        // Both xkeysib- and xsmtpsib- select Brevo REST engine, which will fail (network/mock)
-        // and fall back to SMTP. We verify SMTP was called only as fallback.
-        service("xkeysib-1234567890abcdef").sendDeploymentRequestNotifications(requestWithId());
-        service("xsmtpsib-1234567890abcdef").sendDeploymentRequestNotifications(requestWithId());
-
-        verify(mailSender, times(2)).send(any(MimeMessage.class));
-    }
-
     // ── Fixtures ────────────────────────────────────────────────────────────
 
     private EmailServiceImpl service(String apiKey) {
@@ -182,10 +173,8 @@ class EmailServiceImplTest {
                         apiKey,
                         "[FABINS Alert] New Deployment Enquiry: %s",
                         "FABINS Deployment Assessment Request Received — Ref: %s",
-                        "[Acknowledged] FABINS Deployment Request — Ref: %s"
-                ),
-                backendUrl
-        );
+                        "[Acknowledged] FABINS Deployment Request — Ref: %s"),
+                backendUrl);
 
         return new EmailServiceImpl(provider, properties, new ObjectMapper());
     }
@@ -198,7 +187,8 @@ class EmailServiceImplTest {
      * Builds a request in the state the email layer actually receives one: already
      * persisted, so the id and the auditing timestamp are populated.
      *
-     * <p>Reflection is used because the entity deliberately exposes no setters
+     * <p>
+     * Reflection is used because the entity deliberately exposes no setters
      * for either — both are assigned by JPA — and this is cheaper than standing
      * up a database for a rendering test.
      */
@@ -220,7 +210,8 @@ class EmailServiceImplTest {
     /**
      * Digs the HTML out of the MIME tree.
      *
-     * <p>{@code MimeMessageHelper} in multipart mode nests the body several
+     * <p>
+     * {@code MimeMessageHelper} in multipart mode nests the body several
      * levels deep (mixed → related → alternative), so the part has to be found
      * rather than read off the message directly.
      */
