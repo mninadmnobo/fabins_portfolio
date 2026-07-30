@@ -43,23 +43,23 @@ export const HeroSection = () => (
           {/* Wonderful 3-Pillar Tagline Component */}
           <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-3">
             <p className="max-w-xl text-lg font-medium leading-relaxed text-ink-muted sm:text-xl">
-              <span className="text-ink font-semibold">Every defect caught.</span>{' '}
-              <span className="text-ink font-semibold">Every millimetre measured.</span>{' '}
-              <span className="text-ink font-semibold">Every roll graded.</span>
+              <span className="text-ink font-semibold">Zero defect escapes.</span>{' '}
+              <span className="text-ink font-semibold">Sub-millimetre precision.</span>{' '}
+              <span className="text-ink font-semibold">Automated 4-point grading.</span>
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
-                Every defect <span className="text-accent font-bold">caught</span>
+                Zero defect <span className="text-accent font-bold">escapes</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                Every millimetre <span className="text-accent font-bold">measured</span>
+                Sub-millimetre <span className="text-accent font-bold">precision</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                Every roll <span className="text-accent font-bold">graded</span>
+                Automated 4-point <span className="text-accent font-bold">grading</span>
               </span>
             </div>
           </motion.div>
