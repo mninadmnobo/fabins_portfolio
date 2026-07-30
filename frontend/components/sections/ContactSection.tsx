@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
-import { CheckCircle2, Mail, MapPin } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { CheckCircle2, Mail, MapPin, X, Building2, User } from 'lucide-react'
 import { submitDeploymentRequest, type DeploymentRequest } from '@/lib/api/contact'
 import { Section } from '@/components/ui/Section'
 import { SectionHeader } from '@/components/ui/SectionHeader'
@@ -39,7 +39,7 @@ import { fadeUpProps } from '@/lib/animations'
  * `status` drives which of three views is rendered:
  *   'editing'   → the form (also the state returned to after an error)
  *   'sending'   → the form, disabled, with a pending button label
- *   'submitted' → the confirmation panel
+ *   'submitted' → the confirmation panel or popup modal
  * `errorMessage` is set only when a submission fails and is shown above the
  * submit button; the visitor's input is preserved so they can simply retry.
  */
@@ -59,6 +59,7 @@ export const ContactSection = () => {
   const [status, setStatus] = useState<FormStatus>('editing')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [formData, setFormData] = useState<DeploymentRequest>(EMPTY_FORM)
+  const [lastSubmitted, setLastSubmitted] = useState<DeploymentRequest | null>(null)
 
   /**
    * Returns an onChange handler bound to one field, so each input needs only
@@ -66,8 +67,8 @@ export const ContactSection = () => {
    */
   const updateField =
     (field: keyof DeploymentRequest) =>
-      (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-        setFormData((previous) => ({ ...previous, [field]: event.target.value }))
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setFormData((previous) => ({ ...previous, [field]: event.target.value }))
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -81,6 +82,7 @@ export const ContactSection = () => {
     const result = await submitDeploymentRequest(formData)
 
     if (result.ok) {
+      setLastSubmitted({ ...formData })
       setStatus('submitted')
       setFormData(EMPTY_FORM)
     } else {
@@ -131,7 +133,7 @@ export const ContactSection = () => {
                 <div className="flex h-14 w-14 items-center justify-center rounded-full border border-line bg-panel-2 text-accent">
                   <CheckCircle2 className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-semibold tracking-tight">Request received</h3>
+                <h3 className="text-xl font-semibold tracking-tight text-ink">Request received</h3>
                 <p className="max-w-sm text-sm leading-relaxed text-ink-muted">
                   Thanks for your interest in FABINS. Our engineering team will review your mill
                   specifications and get back to you shortly.
@@ -233,6 +235,83 @@ export const ContactSection = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* ── High-End Success Popup Modal ────────────────────────────────────── */}
+      <AnimatePresence>
+        {status === 'submitted' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop Blur Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setStatus('editing')}
+              className="fixed inset-0 bg-ink/50 backdrop-blur-md"
+            />
+
+            {/* Modal Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-line bg-panel p-8 shadow-2xl shadow-accent/20"
+            >
+              {/* Top Ambient Glow Gradient */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-accent via-cyan-500 to-blue-600" />
+
+              {/* Close Icon Button */}
+              <button
+                onClick={() => setStatus('editing')}
+                className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-ink-soft hover:bg-panel-2 hover:text-ink transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="flex flex-col items-center text-center">
+                {/* Glowing Success Badge */}
+                <div className="relative mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 border border-accent/30 text-accent ring-8 ring-accent/5">
+                  <CheckCircle2 className="h-10 w-10 animate-bounce" />
+                </div>
+
+                <h3 className="text-2xl font-bold tracking-tight text-ink">
+                  Enquiry Submitted Successfully!
+                </h3>
+                <p className="mt-2 text-sm text-ink-muted leading-relaxed max-w-sm">
+                  Thank you for your enquiry. Your deployment request has been logged in our R&amp;D queue, and a confirmation email has been dispatched.
+                </p>
+
+                {/* Submitted Summary Details Box */}
+                {lastSubmitted && (
+                  <div className="mt-6 w-full rounded-xl border border-line bg-panel-2 p-4 text-left space-y-2.5">
+                    <div className="flex items-center gap-2.5 text-xs text-ink-muted">
+                      <Building2 className="h-4 w-4 shrink-0 text-accent" />
+                      <span>Mill: <strong className="font-semibold text-ink">{lastSubmitted.millName}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-ink-muted">
+                      <User className="h-4 w-4 shrink-0 text-accent" />
+                      <span>Contact: <strong className="font-semibold text-ink">{lastSubmitted.contactName}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-ink-muted">
+                      <Mail className="h-4 w-4 shrink-0 text-accent" />
+                      <span>Email sent to: <strong className="font-semibold text-accent">{lastSubmitted.email}</strong></span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Got it Dismiss Button */}
+                <button
+                  onClick={() => setStatus('editing')}
+                  className="btn btn-primary mt-6 w-full !py-3 font-semibold text-sm shadow-md"
+                >
+                  Got it, thank you!
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </Section>
   )
 }
