@@ -36,52 +36,47 @@ public class FabinsApplication {
 
     public static void main(String[] args) {
         loadDotEnv();
-        sanitizeDatabaseUrl();
-        SpringApplication.run(FabinsApplication.class, args);
-    }
-
-    /**
-     * Converts cloud PostgreSQL URLs (e.g. `postgres://user:pass@host/db`) into standard Java JDBC format:
-     * `jdbc:postgresql://host/db` with extracted username and password properties.
-     */
-    private static void sanitizeDatabaseUrl() {
-        String dbUrl = System.getenv("DATABASE_URL");
-        if (dbUrl == null || dbUrl.isBlank()) {
-            dbUrl = System.getProperty("DATABASE_URL");
-        }
-        if (dbUrl != null && !dbUrl.isBlank()) {
-            String url = dbUrl.trim();
-            if (url.startsWith("jdbc:")) {
-                url = url.substring(5);
-            }
-            if (url.startsWith("postgres://")) {
-                url = url.substring("postgres://".length());
-            } else if (url.startsWith("postgresql://")) {
-                url = url.substring("postgresql://".length());
-            }
-
-            if (url.contains("@")) {
-                int atIdx = url.indexOf('@');
-                String userInfo = url.substring(0, atIdx);
-                String hostAndDb = url.substring(atIdx + 1);
-
-                if (userInfo.contains(":")) {
-                    int colonIdx = userInfo.indexOf(':');
-                    String user = userInfo.substring(0, colonIdx);
-                    String pass = userInfo.substring(colonIdx + 1);
-
-                    System.setProperty("DATABASE_USERNAME", user);
-                    System.setProperty("spring.datasource.username", user);
-                    System.setProperty("DATABASE_PASSWORD", pass);
-                    System.setProperty("spring.datasource.password", pass);
+        SpringApplication app = new SpringApplication(FabinsApplication.class);
+        app.addListeners((org.springframework.context.ApplicationListener<org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent>) event -> {
+            org.springframework.core.env.ConfigurableEnvironment env = event.getEnvironment();
+            String dbUrl = env.getProperty("DATABASE_URL");
+            if (dbUrl != null && !dbUrl.isBlank()) {
+                String url = dbUrl.trim();
+                if (url.startsWith("jdbc:")) {
+                    url = url.substring(5);
                 }
-                url = hostAndDb;
-            }
+                if (url.startsWith("postgres://")) {
+                    url = url.substring("postgres://".length());
+                } else if (url.startsWith("postgresql://")) {
+                    url = url.substring("postgresql://".length());
+                }
 
-            String cleanJdbcUrl = "jdbc:postgresql://" + url;
-            System.setProperty("DATABASE_URL", cleanJdbcUrl);
-            System.setProperty("spring.datasource.url", cleanJdbcUrl);
-        }
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                if (url.contains("@")) {
+                    int atIdx = url.indexOf('@');
+                    String userInfo = url.substring(0, atIdx);
+                    String hostAndDb = url.substring(atIdx + 1);
+
+                    if (userInfo.contains(":")) {
+                        int colonIdx = userInfo.indexOf(':');
+                        String user = userInfo.substring(0, colonIdx);
+                        String pass = userInfo.substring(colonIdx + 1);
+
+                        map.put("DATABASE_USERNAME", user);
+                        map.put("spring.datasource.username", user);
+                        map.put("DATABASE_PASSWORD", pass);
+                        map.put("spring.datasource.password", pass);
+                    }
+                    url = hostAndDb;
+                }
+
+                String cleanJdbcUrl = "jdbc:postgresql://" + url;
+                map.put("DATABASE_URL", cleanJdbcUrl);
+                map.put("spring.datasource.url", cleanJdbcUrl);
+                env.getPropertySources().addFirst(new org.springframework.core.env.MapPropertySource("cleanCloudDbProperties", map));
+            }
+        });
+        app.run(args);
     }
 
     /**
