@@ -56,5 +56,7 @@ springdoc:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     com.fabins: INFO
+    org.springframework: INFO
+    org.hibernate: INFO

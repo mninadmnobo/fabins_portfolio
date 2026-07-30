@@ -70,7 +70,16 @@ public class FabinsApplication {
                     url = hostAndDb;
                 }
 
+                if (!url.contains(":") && url.contains("/")) {
+                    int slashIdx = url.indexOf('/');
+                    String host = url.substring(0, slashIdx);
+                    String dbPath = url.substring(slashIdx);
+                    url = host + ":5432" + dbPath;
+                }
+
                 String cleanJdbcUrl = "jdbc:postgresql://" + url;
+                System.out.println("🔧 [FABINS LAUNCH] Sanitized Cloud JDBC URL: " + cleanJdbcUrl);
+
                 map.put("DATABASE_URL", cleanJdbcUrl);
                 map.put("spring.datasource.url", cleanJdbcUrl);
                 env.getPropertySources().addFirst(new org.springframework.core.env.MapPropertySource("cleanCloudDbProperties", map));
