@@ -42,9 +42,6 @@ export const HeroSection = () => (
 
           {/* Wonderful 3-Pillar Tagline Component */}
           <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-4">
-            <p className="max-w-xl text-lg font-medium leading-relaxed text-ink-muted sm:text-xl">
-              Next-generation computer vision system that <span className="text-ink font-semibold">detects every defect</span>, <span className="text-ink font-semibold">measures roll dimensions</span>, and <span className="text-ink font-semibold">certifies fabric quality</span> in real time.
-            </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
@@ -79,13 +76,13 @@ export const HeroSection = () => (
         </div>
 
         {/* ── Right: machine photograph ──────────────────────────────────── */}
-        <motion.div {...fadeUpProps(0.2)} className="relative lg:col-span-6">
-          <div className="relative overflow-hidden rounded-[2rem] border border-line bg-panel-2 shadow-[var(--shadow-lift)]">
+        <motion.div {...fadeUpProps(0.2)} className="relative lg:col-span-6 flex justify-center lg:justify-end">
+          <div className="relative max-w-[480px] overflow-hidden rounded-[1.75rem] border border-line bg-panel-2 shadow-[var(--shadow-lift)]">
             {/* eslint-disable-next-line @next/next/no-img-element -- see note in README on image optimisation */}
             <img
               src="/fabins-machine.png"
               alt="FABINS line-scan inspection rig running fabric with a live operator dashboard"
-              className="h-full w-full object-cover"
+              className="max-h-[430px] w-full object-cover object-center"
             />
           </div>
         </motion.div>
