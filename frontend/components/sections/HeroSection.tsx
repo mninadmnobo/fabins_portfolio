@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, Ruler, Award } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 
 /**
@@ -40,12 +40,29 @@ export const HeroSection = () => (
             </span>
           </motion.h1>
 
-          <motion.p
-            {...fadeUpProps(0.18)}
-            className="mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg"
-          >
-            Every defect caught. Every millimetre measured. Every roll graded.
-          </motion.p>
+          {/* Wonderful 3-Pillar Tagline Component */}
+          <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-3">
+            <p className="max-w-xl text-lg font-medium leading-relaxed text-ink-muted sm:text-xl">
+              <span className="text-ink font-semibold">Every defect caught.</span>{' '}
+              <span className="text-ink font-semibold">Every millimetre measured.</span>{' '}
+              <span className="text-ink font-semibold">Every roll graded.</span>
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
+                <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
+                Every defect <span className="text-accent font-bold">caught</span>
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
+                <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                Every millimetre <span className="text-accent font-bold">measured</span>
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-panel-2/90 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm transition-all hover:border-accent/40 hover:shadow-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Every roll <span className="text-accent font-bold">graded</span>
+              </span>
+            </div>
+          </motion.div>
 
           {/* Both buttons scroll to a section further down the same page. */}
           <motion.div {...fadeUpProps(0.24)} className="mt-9 flex flex-wrap items-center gap-3">
