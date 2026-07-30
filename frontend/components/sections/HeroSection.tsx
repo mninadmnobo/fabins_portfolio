@@ -76,13 +76,13 @@ export const HeroSection = () => (
         </div>
 
         {/* ── Right: machine photograph ──────────────────────────────────── */}
-        <motion.div {...fadeUpProps(0.2)} className="relative lg:col-span-6 flex justify-center lg:justify-end">
-          <div className="relative max-w-[480px] overflow-hidden rounded-[1.75rem] border border-line bg-panel-2 shadow-[var(--shadow-lift)]">
+        <motion.div {...fadeUpProps(0.2)} className="relative lg:col-span-6 flex justify-center lg:justify-center">
+          <div className="relative w-full max-w-[420px] sm:max-w-[450px] overflow-hidden rounded-[1.75rem] border border-line bg-panel-2 shadow-[var(--shadow-lift)]">
             {/* eslint-disable-next-line @next/next/no-img-element -- see note in README on image optimisation */}
             <img
               src="/fabins-machine.png"
               alt="FABINS line-scan inspection rig running fabric with a live operator dashboard"
-              className="max-h-[430px] w-full object-cover object-center"
+              className="max-h-[380px] w-full object-cover object-center"
             />
           </div>
         </motion.div>
