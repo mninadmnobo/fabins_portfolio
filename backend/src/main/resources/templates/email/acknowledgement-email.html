@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>FABINS Deployment Request Acknowledged</title>
@@ -12,6 +13,7 @@
       margin: 0;
       padding: 30px 15px;
     }
+
     .wrapper {
       max-width: 620px;
       margin: 0 auto;
@@ -21,32 +23,38 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
       border: 1px solid #e2e8f0;
     }
+
     .header {
       background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
       padding: 32px;
       color: #ffffff;
     }
+
     .brand-title {
       font-size: 22px;
       font-weight: 700;
       margin: 0 0 4px 0;
       color: #ffffff;
     }
+
     .brand-sub {
       color: #6ee7b7;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.5px;
     }
+
     .body-content {
       padding: 32px;
     }
+
     .greeting {
       font-size: 16px;
       font-weight: 600;
       color: #0f172a;
       margin-bottom: 16px;
     }
+
     .badge-ack {
       display: inline-block;
       background-color: #dcfce7;
@@ -57,6 +65,7 @@
       border-radius: 20px;
       margin-bottom: 20px;
     }
+
     .commitment-card {
       background-color: #f0fdf4;
       border: 1px solid #bbf7d0;
@@ -65,12 +74,14 @@
       border-radius: 6px;
       margin: 24px 0;
     }
+
     .commitment-title {
       font-size: 15px;
       font-weight: 700;
       color: #166534;
       margin: 0 0 8px 0;
     }
+
     .ref-pill {
       display: inline-block;
       background-color: #064e3b;
@@ -81,6 +92,7 @@
       padding: 3px 10px;
       border-radius: 4px;
     }
+
     .footer {
       background-color: #f8fafc;
       padding: 24px 32px;
@@ -90,11 +102,13 @@
     }
   </style>
 </head>
+
 <body>
   <div class="wrapper">
     <div class="header">
       <div style="margin-bottom: 14px;">
-        <img src="https://fabins-portfolio.vercel.app/fabins-logo-dark-mode.png" alt="FABINS Logo" height="38" style="display: block; height: 38px; width: auto; max-width: 180px; border: 0; outline: none; text-decoration: none;" />
+        <img src="https://fabins-portfolio.vercel.app/fabins-logo-dark-mode.png" alt="FABINS Logo" height="38"
+          style="display: block; height: 38px; width: auto; max-width: 180px; border: 0; outline: none; text-decoration: none;" />
       </div>
       <h1 class="brand-title">Saturn Textiles Limited</h1>
       <div class="brand-sub">Research &amp; Development Division — FABINS AI Systems</div>
@@ -106,27 +120,32 @@
       <div class="greeting">Dear {{contactName}},</div>
 
       <p style="margin-top: 0; font-size: 15px; color: #334155;">
-        We are pleased to inform you that your deployment enquiry for <strong>{{millName}}</strong> (Reference: <span class="ref-pill">{{requestId}}</span>) has been officially reviewed and <strong>acknowledged</strong> by our R&amp;D Engineering Department.
+        We are pleased to inform you that your deployment enquiry for <strong>{{millName}}</strong> (Reference: <span
+          class="ref-pill">{{requestId}}</span>) has been officially reviewed and <strong>acknowledged</strong> by our
+        R&amp;D Department.
       </p>
 
       <div class="commitment-card">
         <div class="commitment-title">📞 24-Hour Engineering Follow-Up Commitment</div>
         <p style="margin: 0; font-size: 14px; color: #14532d;">
-          A dedicated AI Machine Vision Systems engineer will contact you directly within <strong>24 hours</strong> to discuss frame mounting specifications, camera alignment options, and deployment scheduling.
+          A dedicated Engineer will contact you directly within <strong>24 hours</strong> to discuss frame
+          mounting specifications, camera alignment options, and deployment scheduling.
         </p>
       </div>
 
       <p style="font-size: 14px; color: #475569;">
-        If you need to update any mill details before our call, reply directly to this email or reach us at <a href="mailto:{{adminEmail}}" style="color: #047857;">{{adminEmail}}</a>.
+        If you need to update any mill details before our call, reply directly to this email or reach us at <a
+          href="mailto:{{adminEmail}}" style="color: #047857;">{{adminEmail}}</a>.
       </p>
     </div>
 
     <div class="footer">
-      Warm regards,<br/>
-      <strong style="color: #334155;">R&amp;D Engineering Department</strong><br/>
-      Saturn Textiles Limited<br/>
-      <span style="font-size: 12px; color: #94a3b8;">AI-Based Automated Fabric Defect Inspection System</span>
+      Warm regards,<br />
+      <strong style="color: #334155;">R&amp;D Department</strong><br />
+      Saturn Textiles Limited<br />
+      <span style="font-size: 12px; color: #94a3b8;">Automated Fabric Inspection System (FABINS)</span>
     </div>
   </div>
 </body>
+
 </html>
