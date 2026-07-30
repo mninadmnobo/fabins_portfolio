@@ -76,6 +76,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/deployment-requests").permitAll()
                         .requestMatchers("/api/v1/deployment-requests/*/acknowledge").permitAll()
 
+                        // Public: static images and logo assets for email rendering and favicon.
+                        .requestMatchers("/fabins-logo*.png", "/*.png", "/favicon.ico", "/static/**").permitAll()
+
                         // Public: liveness probe for load balancers.
                         .requestMatchers("/actuator/health/**").permitAll()
 
