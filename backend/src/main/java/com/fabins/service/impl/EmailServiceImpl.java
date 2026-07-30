@@ -138,8 +138,55 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendHtmlEmail(String to, String from, String subject, String htmlContent, String replyTo) {
+        String apiKey = System.getenv("SPRING_MAIL_PASSWORD");
+        if (apiKey == null || apiKey.isBlank()) {
+            apiKey = System.getProperty("SPRING_MAIL_PASSWORD");
+        }
+
+        // 1. Try Brevo REST API (HTTPS Port 443) first — immune to cloud provider SMTP port blocking
+        if (apiKey != null && apiKey.startsWith("xsmtpsib-")) {
+            try {
+                String escapeSubject = subject.replace("\"", "\\\"").replace("\n", " ");
+                String escapeFrom = from.replace("\"", "\\\"");
+                String escapeTo = to.replace("\"", "\\\"");
+                String escapeReplyTo = (replyTo != null ? replyTo : from).replace("\"", "\\\"");
+                
+                // Construct clean JSON body
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                String htmlJsonStr = mapper.writeValueAsString(htmlContent);
+
+                String jsonPayload = String.format(
+                        "{\"sender\":{\"name\":\"Saturn Textiles R&D\",\"email\":\"%s\"},\"to\":[{\"email\":\"%s\"}],\"replyTo\":{\"email\":\"%s\"},\"subject\":\"%s\",\"htmlContent\":%s}",
+                        escapeFrom, escapeTo, escapeReplyTo, escapeSubject, htmlJsonStr
+                );
+
+                java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
+                        .connectTimeout(java.time.Duration.ofSeconds(10))
+                        .build();
+
+                java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                        .uri(java.net.URI.create("https://api.brevo.com/v3/smtp/email"))
+                        .header("accept", "application/json")
+                        .header("api-key", apiKey.trim())
+                        .header("content-type", "application/json")
+                        .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload))
+                        .build();
+
+                java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                    log.info("✅ Brevo REST API email successfully delivered to {} [HTTP Status: {}]", to, response.statusCode());
+                    return;
+                } else {
+                    log.warn("⚠️ Brevo REST API returned HTTP {}: {}. Attempting SMTP fallback...", response.statusCode(), response.body());
+                }
+            } catch (Exception e) {
+                log.warn("⚠️ Brevo REST API dispatch failed: {}. Attempting SMTP fallback...", e.getMessage());
+            }
+        }
+
+        // 2. SMTP Fallback
         if (mailSender == null) {
-            log.info("📧 [MAIL DEV SIMULATION] To: {} | Subject: '{}' (Configure SPRING_MAIL_PASSWORD to send live SMTP emails)",
+            log.info("📧 [MAIL DEV SIMULATION] To: {} | Subject: '{}' (Configure SPRING_MAIL_PASSWORD to send live emails)",
                     to, subject);
             return;
         }
@@ -161,9 +208,9 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+            log.info("✅ SMTP email successfully delivered to {}", to);
         } catch (Exception e) {
-            log.warn("SMTP send skipped or failed for recipient {}: {}. (Configure spring.mail properties for live SMTP delivery)",
-                    to, e.getMessage(), e);
+            log.warn("SMTP send skipped or failed for recipient {}: {}.", to, e.getMessage(), e);
         }
     }
 }
