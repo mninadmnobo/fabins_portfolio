@@ -41,7 +41,8 @@ public class FabinsApplication {
     }
 
     /**
-     * Prepends `jdbc:` prefix to standard PostgreSQL URLs provided by cloud platforms like Render or Railway.
+     * Converts cloud PostgreSQL URLs (e.g. `postgres://user:pass@host/db`) into standard Java JDBC format:
+     * `jdbc:postgresql://host/db` with extracted username and password properties.
      */
     private static void sanitizeDatabaseUrl() {
         String dbUrl = System.getenv("DATABASE_URL");
@@ -49,17 +50,37 @@ public class FabinsApplication {
             dbUrl = System.getProperty("DATABASE_URL");
         }
         if (dbUrl != null && !dbUrl.isBlank()) {
-            String sanitized = dbUrl;
-            if (sanitized.startsWith("postgres://")) {
-                sanitized = "postgresql://" + sanitized.substring("postgres://".length());
-            } else if (sanitized.startsWith("jdbc:postgres://")) {
-                sanitized = "jdbc:postgresql://" + sanitized.substring("jdbc:postgres://".length());
+            String url = dbUrl.trim();
+            if (url.startsWith("jdbc:")) {
+                url = url.substring(5);
             }
-            if (!sanitized.startsWith("jdbc:")) {
-                sanitized = "jdbc:" + sanitized;
+            if (url.startsWith("postgres://")) {
+                url = url.substring("postgres://".length());
+            } else if (url.startsWith("postgresql://")) {
+                url = url.substring("postgresql://".length());
             }
-            System.setProperty("DATABASE_URL", sanitized);
-            System.setProperty("spring.datasource.url", sanitized);
+
+            if (url.contains("@")) {
+                int atIdx = url.indexOf('@');
+                String userInfo = url.substring(0, atIdx);
+                String hostAndDb = url.substring(atIdx + 1);
+
+                if (userInfo.contains(":")) {
+                    int colonIdx = userInfo.indexOf(':');
+                    String user = userInfo.substring(0, colonIdx);
+                    String pass = userInfo.substring(colonIdx + 1);
+
+                    System.setProperty("DATABASE_USERNAME", user);
+                    System.setProperty("spring.datasource.username", user);
+                    System.setProperty("DATABASE_PASSWORD", pass);
+                    System.setProperty("spring.datasource.password", pass);
+                }
+                url = hostAndDb;
+            }
+
+            String cleanJdbcUrl = "jdbc:postgresql://" + url;
+            System.setProperty("DATABASE_URL", cleanJdbcUrl);
+            System.setProperty("spring.datasource.url", cleanJdbcUrl);
         }
     }
 
