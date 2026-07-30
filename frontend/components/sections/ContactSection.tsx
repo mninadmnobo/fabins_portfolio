@@ -66,8 +66,8 @@ export const ContactSection = () => {
    */
   const updateField =
     (field: keyof DeploymentRequest) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setFormData((previous) => ({ ...previous, [field]: event.target.value }))
+      (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+        setFormData((previous) => ({ ...previous, [field]: event.target.value }))
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
