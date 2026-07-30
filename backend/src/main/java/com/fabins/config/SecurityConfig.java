@@ -187,7 +187,7 @@ public class SecurityConfig {
         // OPTIONS is listed for clarity — it is the preflight method and Spring
         // handles it regardless. PUT and DELETE are absent because no endpoint
         // uses them; a method not listed here is refused by the browser.
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
 
         // Response headers are hidden from JavaScript unless exposed. This one

@@ -122,4 +122,22 @@ public class DeploymentRequestServiceImpl implements DeploymentRequestService {
 
         return mapper.toResponse(request);
     }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Deployment request", id);
+        }
+        repository.deleteById(id);
+        log.info("Deleted deployment request {}", id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll() {
+        long count = repository.count();
+        repository.deleteAll();
+        log.info("Deleted all {} deployment requests from database", count);
+    }
 }

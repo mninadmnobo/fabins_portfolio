@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -300,5 +301,38 @@ class DeploymentRequestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"NOT_A_STATUS\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("DELETE all removes all stored requests")
+    void deleteAllAsAdmin() throws Exception {
+        mockMvc().perform(post(ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(validRequest())));
+
+        mockMvc().perform(delete(ENDPOINT))
+                .andExpect(status().isNoContent());
+
+        mockMvc().perform(get(ENDPOINT))
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("DELETE by id removes a single request")
+    void deleteByIdAsAdmin() throws Exception {
+        String body = mockMvc().perform(post(ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(validRequest())))
+                .andReturn().getResponse().getContentAsString();
+
+        String id = objectMapper.readTree(body).get("id").asText();
+
+        mockMvc().perform(delete(ENDPOINT + "/" + id))
+                .andExpect(status().isNoContent());
+
+        mockMvc().perform(get(ENDPOINT + "/" + id))
+                .andExpect(status().isNotFound());
     }
 }

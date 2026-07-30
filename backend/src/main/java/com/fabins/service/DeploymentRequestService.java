@@ -61,4 +61,17 @@ public interface DeploymentRequestService {
      * @return updated response
      */
     DeploymentRequestResponse acknowledge(UUID id);
+
+    /**
+     * Deletes a single request by id.
+     *
+     * @param id the request id
+     * @throws ResourceNotFoundException if no request has that id
+     */
+    void deleteById(UUID id);
+
+    /**
+     * Deletes all deployment requests from the database.
+     */
+    void deleteAll();
 }

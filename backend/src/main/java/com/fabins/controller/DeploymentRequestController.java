@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,25 +36,26 @@ import java.util.UUID;
 /**
  * HTTP endpoints for deployment requests.
  *
- * <p>This class only translates between HTTP and the service layer: bind and
+ * <p>
+ * This class only translates between HTTP and the service layer: bind and
  * validate the payload, call one service method, choose a status code. Any
  * logic beyond that belongs in {@link DeploymentRequestService}.
  *
  * <h2>API design notes</h2>
  * <ul>
- *   <li><strong>Versioned path</strong> — everything sits under {@code /api/v1}.
- *       A breaking change ships as {@code /api/v2} while v1 keeps working, so
- *       a deployed frontend never breaks because the backend was released.</li>
- *   <li><strong>Plural noun, no verbs</strong> — the resource is
- *       {@code /deployment-requests}. The HTTP method is the verb, which is why
- *       there is no {@code /submitDeploymentRequest}.</li>
- *   <li><strong>201 with a {@code Location} header</strong> on create, as
- *       required for a POST that creates a resource.</li>
- *   <li><strong>PATCH, not PUT</strong>, for the status change: it modifies one
- *       field rather than replacing the whole resource.</li>
- *   <li><strong>Status as a sub-resource</strong> ({@code /{id}/status}) rather
- *       than a general update endpoint, so a client cannot rewrite the mill's
- *       submitted details while changing a workflow stage.</li>
+ * <li><strong>Versioned path</strong> — everything sits under {@code /api/v1}.
+ * A breaking change ships as {@code /api/v2} while v1 keeps working, so
+ * a deployed frontend never breaks because the backend was released.</li>
+ * <li><strong>Plural noun, no verbs</strong> — the resource is
+ * {@code /deployment-requests}. The HTTP method is the verb, which is why
+ * there is no {@code /submitDeploymentRequest}.</li>
+ * <li><strong>201 with a {@code Location} header</strong> on create, as
+ * required for a POST that creates a resource.</li>
+ * <li><strong>PATCH, not PUT</strong>, for the status change: it modifies one
+ * field rather than replacing the whole resource.</li>
+ * <li><strong>Status as a sub-resource</strong> ({@code /{id}/status}) rather
+ * than a general update endpoint, so a client cannot rewrite the mill's
+ * submitted details while changing a workflow stage.</li>
  * </ul>
  *
  * <h2>Access control</h2>
@@ -66,132 +68,156 @@ import java.util.UUID;
 @Tag(name = "Deployment requests", description = "Retrofit assessment enquiries from mills")
 public class DeploymentRequestController {
 
-    private final DeploymentRequestService service;
+        private final DeploymentRequestService service;
 
-    public DeploymentRequestController(DeploymentRequestService service) {
-        this.service = service;
-    }
+        public DeploymentRequestController(DeploymentRequestService service) {
+                this.service = service;
+        }
 
-    /**
-     * Submits a new deployment request. Public — this backs the website form.
-     *
-     * <p>{@code @Valid} is what triggers the constraints on
-     * {@link CreateDeploymentRequest}; without it they are silently ignored.
-     */
-    @PostMapping
-    @Operation(
-            summary = "Submit a deployment request",
-            description = "Public endpoint backing the contact form on the FABINS site."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Request recorded"),
-            @ApiResponse(responseCode = "400", description = "Validation failed", content = @Content())
-    })
-    public ResponseEntity<DeploymentRequestResponse> submit(
-            @Valid @RequestBody CreateDeploymentRequest request,
-            UriComponentsBuilder uriBuilder
-    ) {
-        DeploymentRequestResponse created = service.submit(request);
+        /**
+         * Submits a new deployment request. Public — this backs the website form.
+         *
+         * <p>
+         * {@code @Valid} is what triggers the constraints on
+         * {@link CreateDeploymentRequest}; without it they are silently ignored.
+         */
+        @PostMapping
+        @Operation(summary = "Submit a deployment request", description = "Public endpoint backing the contact form on the FABINS site.")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "201", description = "Request recorded"),
+                        @ApiResponse(responseCode = "400", description = "Validation failed", content = @Content())
+        })
+        public ResponseEntity<DeploymentRequestResponse> submit(
+                        @Valid @RequestBody CreateDeploymentRequest request,
+                        UriComponentsBuilder uriBuilder) {
+                DeploymentRequestResponse created = service.submit(request);
 
-        // Built from the incoming request rather than hardcoded, so the URI is
-        // correct behind a proxy or on a non-default port.
-        URI location = uriBuilder
-                .path("/api/v1/deployment-requests/{id}")
-                .buildAndExpand(created.id())
-                .toUri();
+                // Built from the incoming request rather than hardcoded, so the URI is
+                // correct behind a proxy or on a non-default port.
+                URI location = uriBuilder
+                                .path("/api/v1/deployment-requests/{id}")
+                                .buildAndExpand(created.id())
+                                .toUri();
 
-        return ResponseEntity.created(location).body(created);
-    }
+                return ResponseEntity.created(location).body(created);
+        }
 
-    /**
-     * Lists requests, newest first. Admin only.
-     *
-     * <p>{@code @PageableDefault} caps the page size, so a client cannot ask
-     * for a million rows in one call.
-     *
-     * @param status optional filter, e.g. {@code ?status=NEW}
-     */
-    @GetMapping
-    @Operation(summary = "List deployment requests", security = @SecurityRequirement(name = "basicAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "A page of requests"),
-            @ApiResponse(responseCode = "401", description = "Missing or invalid credentials", content = @Content())
-    })
-    public PageResponse<DeploymentRequestResponse> list(
-            @RequestParam(required = false) DeploymentRequestStatus status,
-            @PageableDefault(size = 20) Pageable pageable
-    ) {
-        return service.list(status, pageable);
-    }
+        /**
+         * Lists requests, newest first. Admin only.
+         *
+         * <p>
+         * {@code @PageableDefault} caps the page size, so a client cannot ask
+         * for a million rows in one call.
+         *
+         * @param status optional filter, e.g. {@code ?status=NEW}
+         */
+        @GetMapping
+        @Operation(summary = "List deployment requests", security = @SecurityRequirement(name = "basicAuth"))
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "A page of requests"),
+                        @ApiResponse(responseCode = "401", description = "Missing or invalid credentials", content = @Content())
+        })
+        public PageResponse<DeploymentRequestResponse> list(
+                        @RequestParam(required = false) DeploymentRequestStatus status,
+                        @PageableDefault(size = 20) Pageable pageable) {
+                return service.list(status, pageable);
+        }
 
-    /** Fetches a single request by id. Admin only. */
-    @GetMapping("/{id}")
-    @Operation(summary = "Get one deployment request", security = @SecurityRequirement(name = "basicAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "The request"),
-            @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
-    })
-    public DeploymentRequestResponse getById(@PathVariable UUID id) {
-        return service.getById(id);
-    }
+        /** Fetches a single request by id. Admin only. */
+        @GetMapping("/{id}")
+        @Operation(summary = "Get one deployment request", security = @SecurityRequirement(name = "basicAuth"))
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "The request"),
+                        @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
+        })
+        public DeploymentRequestResponse getById(@PathVariable UUID id) {
+                return service.getById(id);
+        }
 
-    /** Moves a request to a new stage of the follow-up process. Admin only. */
-    @PatchMapping("/{id}/status")
-    @Operation(summary = "Change a request's status", security = @SecurityRequirement(name = "basicAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Updated request"),
-            @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
-    })
-    public DeploymentRequestResponse changeStatus(
-            @PathVariable UUID id,
-            @Valid @RequestBody ChangeStatusRequest request
-    ) {
-        return service.changeStatus(id, request.status());
-    }
+        /** Moves a request to a new stage of the follow-up process. Admin only. */
+        @PatchMapping("/{id}/status")
+        @Operation(summary = "Change a request's status", security = @SecurityRequirement(name = "basicAuth"))
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Updated request"),
+                        @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
+        })
+        public DeploymentRequestResponse changeStatus(
+                        @PathVariable UUID id,
+                        @Valid @RequestBody ChangeStatusRequest request) {
+                return service.changeStatus(id, request.status());
+        }
 
-    /**
-     * Acknowledges a request and dispatches an acknowledgement email to the sender.
-     *
-     * <p>Public and reachable by GET, because it is invoked by clicking a link
-     * in the notification email — an email client cannot issue a POST. POST is
-     * accepted too so that a future admin UI can call it properly.
-     *
-     * <p>Declared as one {@code @RequestMapping} listing both methods rather
-     * than as {@code @GetMapping} plus {@code @PostMapping} on the same method:
-     * Spring merges only one {@code @RequestMapping} meta-annotation per
-     * handler, so the second of the two would be silently discarded.
-     *
-     * <p>Returns HTML rather than JSON because the response is rendered in the
-     * clicker's browser tab, not consumed by code.
-     */
-    @RequestMapping(value = "/{id}/acknowledge", method = {RequestMethod.GET, RequestMethod.POST})
-    @Operation(summary = "Acknowledge a deployment request and notify sender")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Request acknowledged and notification sent"),
-            @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
-    })
-    public ResponseEntity<String> acknowledge(@PathVariable UUID id) {
-        DeploymentRequestResponse response = service.acknowledge(id);
-        String htmlResponse = """
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="UTF-8">
-              <title>Request Acknowledged</title>
-            </head>
-            <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; line-height: 1.6; background-color: #f8fafc;">
-              <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h2 style="color: #16a34a; margin-top: 0;">&#10003; Request Successfully Acknowledged</h2>
-                <p style="font-size: 15px; color: #1e293b;">Deployment Request Reference: <strong>%s</strong> for <strong>%s</strong> has been acknowledged by Saturn R&D Team.</p>
-                <p style="color: #64748b; font-size: 14px;">A confirmation email has been dispatched to <strong>%s</strong> confirming our team will contact them within 24 hours.</p>
-              </div>
-            </body>
-            </html>
-            """.formatted(response.referenceCode(), response.millName(), response.email());
-        // Charset is explicit: a mill name containing non-ASCII characters would
-        // otherwise be decoded as ISO-8859-1 by the browser.
-        return ResponseEntity.ok()
-                .contentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8))
-                .body(htmlResponse);
-    }
+        /**
+         * Acknowledges a request and dispatches an acknowledgement email to the sender.
+         *
+         * <p>
+         * Public and reachable by GET, because it is invoked by clicking a link
+         * in the notification email — an email client cannot issue a POST. POST is
+         * accepted too so that a future admin UI can call it properly.
+         *
+         * <p>
+         * Declared as one {@code @RequestMapping} listing both methods rather
+         * than as {@code @GetMapping} plus {@code @PostMapping} on the same method:
+         * Spring merges only one {@code @RequestMapping} meta-annotation per
+         * handler, so the second of the two would be silently discarded.
+         *
+         * <p>
+         * Returns HTML rather than JSON because the response is rendered in the
+         * clicker's browser tab, not consumed by code.
+         */
+        @RequestMapping(value = "/{id}/acknowledge", method = { RequestMethod.GET, RequestMethod.POST })
+        @Operation(summary = "Acknowledge a deployment request and notify sender")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Request acknowledged and notification sent"),
+                        @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
+        })
+        public ResponseEntity<String> acknowledge(@PathVariable UUID id) {
+                DeploymentRequestResponse response = service.acknowledge(id);
+                String htmlResponse = """
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                  <meta charset="UTF-8">
+                                  <title>Request Acknowledged</title>
+                                </head>
+                                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; line-height: 1.6; background-color: #f8fafc;">
+                                  <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                    <h2 style="color: #16a34a; margin-top: 0;">&#10003; Request Successfully Acknowledged</h2>
+                                    <p style="font-size: 15px; color: #1e293b;">Deployment Request Reference: <strong>%s</strong> for <strong>%s</strong> has been acknowledged by Saturn R&D Team.</p>
+                                    <p style="color: #64748b; font-size: 14px;">A confirmation email has been dispatched to <strong>%s</strong> confirming our team will contact them within 24 hours.</p>
+                                  </div>
+                                </body>
+                                </html>
+                                """
+                                .formatted(response.referenceCode(), response.millName(), response.email());
+                // Charset is explicit: a mill name containing non-ASCII characters would
+                // otherwise be decoded as ISO-8859-1 by the browser.
+                return ResponseEntity.ok()
+                                .contentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8))
+                                .body(htmlResponse);
+        }
+
+        /** Deletes a single request by id. Admin only. */
+        @DeleteMapping("/{id}")
+        @Operation(summary = "Delete one deployment request", security = @SecurityRequirement(name = "basicAuth"))
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "Request deleted"),
+                        @ApiResponse(responseCode = "404", description = "No request with that id", content = @Content())
+        })
+        public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+                service.deleteById(id);
+                return ResponseEntity.noContent().build();
+        }
+
+        /** Deletes all deployment requests from the database. Admin only. */
+        @DeleteMapping
+        @Operation(summary = "Delete all deployment requests", security = @SecurityRequirement(name = "basicAuth"))
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "All requests deleted"),
+                        @ApiResponse(responseCode = "401", description = "Missing or invalid credentials", content = @Content())
+        })
+        public ResponseEntity<Void> deleteAll() {
+                service.deleteAll();
+                return ResponseEntity.noContent().build();
+        }
 }
