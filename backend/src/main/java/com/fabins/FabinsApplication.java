@@ -49,11 +49,17 @@ public class FabinsApplication {
             dbUrl = System.getProperty("DATABASE_URL");
         }
         if (dbUrl != null && !dbUrl.isBlank()) {
-            if ((dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) && !dbUrl.startsWith("jdbc:")) {
-                String jdbcUrl = "jdbc:" + dbUrl;
-                System.setProperty("DATABASE_URL", jdbcUrl);
-                System.setProperty("spring.datasource.url", jdbcUrl);
+            String sanitized = dbUrl;
+            if (sanitized.startsWith("postgres://")) {
+                sanitized = "postgresql://" + sanitized.substring("postgres://".length());
+            } else if (sanitized.startsWith("jdbc:postgres://")) {
+                sanitized = "jdbc:postgresql://" + sanitized.substring("jdbc:postgres://".length());
             }
+            if (!sanitized.startsWith("jdbc:")) {
+                sanitized = "jdbc:" + sanitized;
+            }
+            System.setProperty("DATABASE_URL", sanitized);
+            System.setProperty("spring.datasource.url", sanitized);
         }
     }
 
