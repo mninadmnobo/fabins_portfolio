@@ -43,7 +43,7 @@ export const HeroSection = () => (
           {/* Wonderful 3-Pillar Tagline Component */}
           <motion.div {...fadeUpProps(0.18)} className="mt-6 space-y-4">
             <p className="max-w-xl text-lg font-medium leading-relaxed text-ink-muted sm:text-xl">
-              Next-generation industrial AI that <span className="text-ink font-semibold">detects every defect</span>, <span className="text-ink font-semibold">measures roll dimensions</span>, and <span className="text-ink font-semibold">certifies fabric quality</span> in real time.
+              Next-generation computer vision system that <span className="text-ink font-semibold">detects every defect</span>, <span className="text-ink font-semibold">measures roll dimensions</span>, and <span className="text-ink font-semibold">certifies fabric quality</span> in real time.
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
