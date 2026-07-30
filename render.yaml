@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: fabins-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: FABINS_ADMIN_USERNAME
+        sync: false
+      - key: FABINS_ADMIN_PASSWORD
+        sync: false
+      - key: FABINS_ALLOWED_ORIGIN
+        sync: false
+      - key: FABINS_BACKEND_URL
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
