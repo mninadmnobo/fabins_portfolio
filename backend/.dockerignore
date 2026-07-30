@@ -1,13 +1,7 @@
-# Maven build output & temporary files
+# Build outputs & IDE noise
 target/
-.mvn/
-mvnw
-mvnw.cmd
 .git
 .gitignore
 .vscode
 .idea
-Dockerfile
-.dockerignore
-README.md
 *.log
