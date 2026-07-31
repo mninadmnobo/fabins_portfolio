@@ -10,7 +10,6 @@ import {
   Rocket,
 } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
-import { SectionHeader } from '@/components/ui/SectionHeader'
 import { fadeUpProps } from '@/lib/animations'
 import { useContactForm } from '@/lib/hooks/useContactForm'
 
@@ -45,13 +44,30 @@ export const ContactSection = () => {
     <Section id="contact">
       <div className="mx-auto max-w-3xl">
         {/* ── Section header ───────────────────────────────────────────────── */}
-        <SectionHeader
-          layout="stacked"
-          eyebrow="LET'S CONNECT"
-          title="Send Us a Message"
-          description="Have a question, partnership idea, or just want to know more about FABINS? Write to us and the R&D team will reply within 1–2 working days."
-          descriptionClassName="mx-auto max-w-xl text-center"
-        />
+        <div className="mb-8 text-center space-y-3">
+          <motion.span {...fadeUpProps(0.05)} className="eyebrow mx-auto justify-center">
+            <span className="h-2 w-2 rounded-full bg-accent sm:h-2.5 sm:w-2.5" />
+            LET&#39;S CONNECT
+          </motion.span>
+
+          <motion.p
+            {...fadeUpProps(0.1)}
+            className="mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-ink-muted"
+          >
+            Have a question, technical inquiry, or partnership request? Send a message to our R&amp;D team below and we will respond within 1–2 business days.
+          </motion.p>
+
+          <motion.div {...fadeUpProps(0.14)} className="pt-2">
+            <Link
+              href="/deploy"
+              className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-quiet px-4.5 py-2 text-xs font-semibold text-accent transition-all duration-300 hover:border-accent hover:bg-accent/15 hover:shadow-sm"
+            >
+              <Rocket className="h-3.5 w-3.5" />
+              <span>Looking for factory deployment? Open FABINS deployment Form</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </motion.div>
+        </div>
 
         {/* ── Form card ────────────────────────────────────────────────────── */}
         <motion.div {...fadeUpProps(0.14)} className="mt-10">
@@ -223,26 +239,6 @@ export const ContactSection = () => {
           </div>
         </motion.div>
 
-        {/* ── Deploy FABINS callout ─────────────────────────────────────────── */}
-        {/*
-         * Visitors who want to submit a full RMG factory deployment assessment
-         * (with frame counts, fabric types, ERP integration, etc.) are directed
-         * to the dedicated /deploy page rather than through this general form.
-         */}
-        <motion.p
-          {...fadeUpProps(0.22)}
-          className="mt-6 text-center text-sm text-ink-muted"
-        >
-          Want to deploy FABINS at your factory?{' '}
-          <Link
-            href="/deploy"
-            className="inline-flex items-center gap-1 font-semibold text-accent hover:underline"
-          >
-            <Rocket className="h-3.5 w-3.5" />
-            Open the RMG Assessment Form
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </motion.p>
       </div>
     </Section>
   )
