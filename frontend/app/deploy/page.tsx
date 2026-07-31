@@ -468,7 +468,7 @@ export default function DeployPage() {
 
                           <div>
                             <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
-                              Personal Work Email Address <span className="text-accent">*</span>
+                              Email Address <span className="text-accent">*</span>
                             </label>
                             <div className="relative">
                               <input
@@ -485,7 +485,7 @@ export default function DeployPage() {
 
                           <div>
                             <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
-                              Direct Phone / WhatsApp Number <span className="text-accent">*</span>
+                              Phone Number <span className="text-accent">*</span>
                             </label>
                             <div className="relative">
                               <input
