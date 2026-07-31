@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ShieldCheck, CheckCircle2, Ruler, Award } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
@@ -59,14 +60,14 @@ export const HeroSection = () => (
             </div>
           </motion.div>
 
-          {/* Both buttons scroll to a section further down the same page. */}
+          {/* Action buttons: See how it works scrolls to #system, Deploy FABINS links to /deploy */}
           <motion.div {...fadeUpProps(0.24)} className="mt-9 flex flex-wrap items-center gap-3">
             <a href="#system" className="btn btn-primary">
               See how it works
             </a>
-            <a href="#contact" className="btn btn-primary">
+            <Link href="/deploy" className="btn btn-primary">
               Deploy FABINS
-            </a>
+            </Link>
           </motion.div>
 
           <motion.p {...fadeUpProps(0.3)} className="mt-7 flex items-start gap-2 text-sm text-ink-soft">

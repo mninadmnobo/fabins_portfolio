@@ -1,6 +1,7 @@
 package com.fabins.service.impl;
 
 import com.fabins.config.ApiProperties;
+import com.fabins.entity.ContactInquiry;
 import com.fabins.entity.DeploymentRequest;
 import com.fabins.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,9 +72,12 @@ public class EmailServiceImpl implements EmailService {
     /** Caps how long a hung network path can occupy an async worker thread. */
     private static final Duration HTTP_TIMEOUT = Duration.ofSeconds(10);
 
-    private static final String TEMPLATE_ADMIN_NOTIFICATION = "templates/email/admin-notification.html";
-    private static final String TEMPLATE_SENDER_CONFIRMATION = "templates/email/sender-confirmation.html";
-    private static final String TEMPLATE_ACKNOWLEDGEMENT = "templates/email/acknowledgement-email.html";
+    private static final String TEMPLATE_ADMIN_NOTIFICATION       = "templates/email/admin-notification.html";
+    private static final String TEMPLATE_SENDER_CONFIRMATION       = "templates/email/sender-confirmation.html";
+    private static final String TEMPLATE_ACKNOWLEDGEMENT           = "templates/email/acknowledgement-email.html";
+    private static final String TEMPLATE_CONTACT_ADMIN             = "templates/email/contact-admin-notification.html";
+    private static final String TEMPLATE_CONTACT_SENDER            = "templates/email/contact-sender-confirmation.html";
+    private static final String TEMPLATE_CONTACT_ACKNOWLEDGEMENT   = "templates/email/contact-acknowledgement-email.html";
 
     /**
      * Null when no {@code spring.mail.host} is configured. Resolved once at
@@ -154,6 +158,128 @@ public class EmailServiceImpl implements EmailService {
                 String.format(mail.acknowledgementSubject(), reference),
                 body,
                 mail.adminAddress());
+    }
+
+    /**
+     * Notifies the R&amp;D team of a new contact inquiry and sends the visitor
+     * a confirmation receipt.
+     *
+     * <p>The two sends are independent: a failure of the first must not suppress
+     * the second, so each is dispatched separately.
+     *
+     * @param inquiry the newly persisted contact inquiry
+     */
+    @Override
+    @Async
+    public void sendContactInquiryNotifications(ContactInquiry inquiry) {
+        log.info("Dispatching contact inquiry notifications for id {} [Ref: {}]",
+                inquiry.getId(), inquiry.getReferenceCode());
+
+        sendContactAdminNotification(inquiry);
+        sendContactSenderConfirmation(inquiry);
+    }
+
+    /**
+     * Sends the internal R&amp;D team alert for a new contact inquiry.
+     *
+     * <p>The email includes:
+     * <ul>
+     *   <li>The visitor's name, email, subject, and full message.</li>
+     *   <li>A <strong>one-click Acknowledge Inquiry</strong> button that hits
+     *       {@code GET /api/v1/contact-inquiries/{id}/acknowledge}, moves the
+     *       status to {@code REPLIED}, and sends the visitor an acknowledgement
+     *       email — exactly mirroring the deployment-request flow.</li>
+     *   <li>A Gmail draft link for a manual reply.</li>
+     * </ul>
+     * The Reply-To header is set to the visitor's email so a direct reply from
+     * the inbox reaches them without copying a shared inbox address.
+     */
+    private void sendContactAdminNotification(ContactInquiry inquiry) {
+        ApiProperties.Mail mail = properties.mail();
+        String reference = inquiry.getReferenceCode();
+
+        String body = render(TEMPLATE_CONTACT_ADMIN, Map.of(
+                "acknowledgeUrl", contactAcknowledgeUrl(inquiry),
+                "referenceCode",  reference,
+                "name",           inquiry.getName(),
+                "email",          inquiry.getEmail(),
+                "subject",        inquiry.getSubject(),
+                "message",        inquiry.getMessage(),
+                "submittedAt",    String.valueOf(inquiry.getCreatedAt())
+        ));
+
+        dispatch(mail.adminAddress(),
+                "[FABINS] New Contact Inquiry: " + inquiry.getSubject(),
+                body,
+                inquiry.getEmail());
+    }
+
+    /**
+     * Sends the visitor a confirmation that their inquiry was received and is
+     * in the R&amp;D team's queue.
+     */
+    private void sendContactSenderConfirmation(ContactInquiry inquiry) {
+        ApiProperties.Mail mail = properties.mail();
+        String reference = inquiry.getReferenceCode();
+
+        String body = render(TEMPLATE_CONTACT_SENDER, Map.of(
+                "name",          inquiry.getName(),
+                "referenceCode", reference,
+                "subject",       inquiry.getSubject(),
+                "adminEmail",    mail.adminAddress()
+        ));
+
+        dispatch(inquiry.getEmail(),
+                "[FABINS] We received your message — " + reference,
+                body,
+                mail.adminAddress());
+    }
+
+    /**
+     * Sends the visitor an acknowledgement email after the R&amp;D admin clicks
+     * the one-click acknowledge link in the admin notification.
+     *
+     * <p>Mirrors {@link #sendAcknowledgementNotification(DeploymentRequest)}
+     * for the contact-inquiry flow: the visitor learns their message has been
+     * personally read and that a reply is coming.
+     *
+     * @param inquiry the inquiry that has just been moved to {@code REPLIED}
+     */
+    @Override
+    @Async
+    public void sendContactInquiryAcknowledgement(ContactInquiry inquiry) {
+        ApiProperties.Mail mail = properties.mail();
+        String reference = inquiry.getReferenceCode();
+
+        log.info("Dispatching contact inquiry acknowledgement for id {} [Ref: {}]",
+                inquiry.getId(), reference);
+
+        String body = render(TEMPLATE_CONTACT_ACKNOWLEDGEMENT, Map.of(
+                "name",          inquiry.getName(),
+                "subject",       inquiry.getSubject(),
+                "referenceCode", reference,
+                "adminEmail",    mail.adminAddress()
+        ));
+
+        dispatch(inquiry.getEmail(),
+                "[FABINS] Your inquiry has been acknowledged — " + reference,
+                body,
+                mail.adminAddress());
+    }
+
+    /**
+     * Builds the absolute acknowledge URL for a contact inquiry.
+     *
+     * <p>Placed in the admin notification email as a one-click button.
+     * Must be absolute because the link is clicked from an email client that
+     * has no notion of this server's origin.
+     *
+     * @return e.g. {@code https://api.fabins.com/api/v1/contact-inquiries/{id}/acknowledge}
+     */
+    private String contactAcknowledgeUrl(ContactInquiry inquiry) {
+        String base = properties.backendUrl().trim();
+        if (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+        return base + "/api/v1/contact-inquiries/" + inquiry.getId() + "/acknowledge";
     }
 
     /**
