@@ -99,15 +99,32 @@ export const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* CTA — scrolls to the homepage contact form */}
-          <Link
-            href={isDeployPage ? '/#contact' : '#contact'}
-            onClick={(e) => !isDeployPage && handleNavigate(e, 'contact')}
-            className="btn btn-primary hidden !px-5 !py-2.5 text-[13px] sm:inline-flex items-center gap-1.5"
-          >
-            <Mail className="h-3.5 w-3.5" />
-            <span>Let&#39;s Connect</span>
-          </Link>
+          {/* CTA — scrolls to the contact section; uses the same active pill as nav links */}
+          {(() => {
+            const isContactActive = !isDeployPage && activeSection === 'contact'
+            return (
+              <Link
+                href={isDeployPage ? '/#contact' : '#contact'}
+                onClick={(e) => !isDeployPage && handleNavigate(e, 'contact')}
+                className={cn(
+                  'relative hidden !px-5 !py-2.5 text-[13px] sm:inline-flex items-center gap-1.5 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5',
+                  isContactActive
+                    ? 'text-[var(--btn-ink)]'
+                    : 'text-ink-muted hover:bg-accent-quiet hover:text-accent'
+                )}
+              >
+                {isContactActive && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[var(--btn-from)] to-[var(--btn-to)] shadow-[0_8px_25px_-8px_var(--btn-from)]"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <Mail className="relative z-10 h-3.5 w-3.5" />
+                <span className="relative z-10">Let&#39;s Connect</span>
+              </Link>
+            )
+          })()}
 
           <button
             type="button"
@@ -144,14 +161,26 @@ export const Navbar = () => {
             </Link>
           ))}
 
-          <Link
-            href={isDeployPage ? '/#contact' : '#contact'}
-            onClick={(e) => { if (!isDeployPage) handleNavigate(e, 'contact'); setIsMobileMenuOpen(false); }}
-            className="btn btn-primary mt-2 w-full justify-center text-sm font-bold flex items-center gap-2"
-          >
-            <Mail className="h-4 w-4" />
-            <span>Let&#39;s Connect</span>
-          </Link>
+          {(() => {
+            const isContactActive = !isDeployPage && activeSection === 'contact'
+            return (
+              <Link
+                href={isDeployPage ? '/#contact' : '#contact'}
+                onClick={(e) => { if (!isDeployPage) handleNavigate(e, 'contact'); setIsMobileMenuOpen(false); }}
+                className={cn(
+                  'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 mt-1',
+                  isContactActive
+                    ? 'bg-gradient-to-r from-[var(--btn-from)] to-[var(--btn-to)] text-[var(--btn-ink)] shadow-[0_8px_25px_-8px_var(--btn-from)]'
+                    : 'text-ink-muted hover:bg-panel-2 hover:text-ink'
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Let&#39;s Connect
+                </span>
+              </Link>
+            )
+          })()}
         </div>
       )}
     </header>
