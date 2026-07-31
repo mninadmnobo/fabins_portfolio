@@ -177,10 +177,6 @@ export default function DeployPage() {
       setErrorMessage('Please select a Factory Sector / Operation Type.')
       return
     }
-    if (!formData.inspectionFramesCount) {
-      setErrorMessage('Please select Inspection Machines / Frames Count.')
-      return
-    }
     if (!formData.rollWidth) {
       setErrorMessage('Please select Roll / Table Width.')
       return
@@ -198,7 +194,7 @@ export default function DeployPage() {
       return
     }
     if (!formData.message?.trim()) {
-      setErrorMessage('Please provide Machine Frame Notes & Special Instructions.')
+      setErrorMessage('Please provide General Instructions & Requirements.')
       return
     }
 
@@ -548,32 +544,6 @@ export default function DeployPage() {
                         </div>
                       </div>
 
-                      {/* Frame Count Pills */}
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                          Inspection Machines / Frames Count <span className="text-accent">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {FRAME_COUNTS.map((cnt) => {
-                            const active = formData.inspectionFramesCount === cnt
-                            return (
-                              <button
-                                key={cnt}
-                                type="button"
-                                onClick={() => setFieldValue('inspectionFramesCount', cnt)}
-                                className={cn(
-                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
-                                  active
-                                    ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
-                                    : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
-                                )}
-                              >
-                                {active ? '✓ ' : ''}{cnt}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </div>
 
                       {/* Roll Width & Inspection Speed Pills */}
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-2">
@@ -715,10 +685,10 @@ export default function DeployPage() {
                       </div>
                       <div>
                         <h3 className="text-base font-bold text-ink font-heading">
-                          4. Machine Frame Notes &amp; Special Instructions <span className="text-accent">*</span>
+                          4. General Instructions &amp; Requirements <span className="text-accent">*</span>
                         </h3>
                         <p className="text-xs text-ink-soft">
-                          Provide details about existing backlight tables, roller speed encoders, or mill constraints.
+                          Provide general instructions, custom requests, or operational notes for our engineering team.
                         </p>
                       </div>
                     </div>
@@ -728,7 +698,7 @@ export default function DeployPage() {
                       required
                       value={formData.message || ''}
                       onChange={updateField('message')}
-                      placeholder="Describe your current fabric inspection frame setups, lighting preference (backlit/toplit), or custom technical requests..."
+                      placeholder="Enter any general instructions, mill notes, lighting preferences, or custom requirements..."
                       className="input-field text-sm leading-relaxed resize-y"
                     />
                   </div>
