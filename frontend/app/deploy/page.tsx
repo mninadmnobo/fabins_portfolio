@@ -246,7 +246,7 @@ export default function DeployPage() {
             className="inline-flex items-center gap-2.5 rounded-full border border-line-strong/60 bg-panel px-5 py-2.5 text-sm font-bold text-ink transition-all duration-300 hover:border-accent hover:text-accent hover:shadow-md mb-8 group"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to Overview</span>
+            <span>Back to Home</span>
           </Link>
 
           {/* Page Banner Header */}
