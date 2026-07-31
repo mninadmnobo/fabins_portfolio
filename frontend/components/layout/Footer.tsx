@@ -31,7 +31,7 @@ export const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
           {/* ── Brand and summary ──────────────────────────────────────── */}
-          <div className="md:col-span-5">
+          <div className="md:col-span-5 flex flex-col items-start">
             <a
               href="#home"
               onClick={(event) => handleNavigate(event, 'home')}
@@ -40,13 +40,7 @@ export const Footer = () => {
               <Wordmark size="md" className="gap-3" />
             </a>
 
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-muted">
-              An AI-powered Fabric Defect Inspection System built for Textile Industries. It
-              captures moving fabric, measures defects in millimetres, and issues automated
-              Four-Point grading reports directly on existing inspection frames.
-            </p>
-
-            <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-3">
+            <div className="mt-4 inline-flex items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-3">
               <ShieldCheck className="h-4 w-4 shrink-0 text-accent" />
               <span className="text-xs leading-tight">
                 <span className="block font-semibold">Saturn Textiles Limited</span>
@@ -79,11 +73,6 @@ export const Footer = () => {
               <li>
                 <Link href="/#innovators" className="text-ink-muted transition-colors hover:text-accent">
                   Innovators
-                </Link>
-              </li>
-              <li>
-                <Link href="/deploy" className="text-accent font-semibold transition-colors hover:underline">
-                  Deploy FABINS →
                 </Link>
               </li>
             </ul>

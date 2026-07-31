@@ -254,6 +254,10 @@
     @apply w-full rounded-2xl border border-line bg-panel-2 px-4 py-3.5 text-sm text-ink outline-none transition-colors placeholder:text-ink-soft;
   }
 
+  .input-field {
+    @apply w-full rounded-xl border border-line-strong/60 bg-panel px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-ink-soft/70 focus:border-accent focus:bg-panel focus:ring-2 focus:ring-accent/20 shadow-sm;
+  }
+
   /* Focus ring drawn with box-shadow so it does not shift layout. */
   .field:focus {
     border-color: var(--accent);

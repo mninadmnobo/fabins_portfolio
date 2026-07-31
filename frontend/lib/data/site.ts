@@ -53,5 +53,4 @@ export const SECTION_IDS: readonly string[] = [
  */
 export const FOOTER_LINKS: readonly NavLink[] = [
   ...NAV_LINKS.filter((link) => link.id !== 'home'),
-  { name: 'Deploy FABINS', id: PRIMARY_CTA.id },
 ]

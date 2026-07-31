@@ -16,8 +16,10 @@ import {
   Sliders,
   User,
   Zap,
-  HelpCircle,
   FileCheck2,
+  Phone,
+  Mail,
+  Briefcase,
 } from 'lucide-react'
 import { PageShell } from '@/components/layout/PageShell'
 import { submitDeploymentRequest, type DeploymentRequest } from '@/lib/api/contact'
@@ -32,15 +34,15 @@ const EMPTY_FORM: DeploymentRequest = {
   email: '',
   phone: '',
   location: '',
-  factoryType: 'Knit Fabric Mill',
-  inspectionFramesCount: '2 - 5 Frames',
+  factoryType: '',
+  inspectionFramesCount: '',
   fabricTypes: '',
   dailyProductionVolume: '',
-  inspectionSpeed: '25 m/min',
-  rollWidth: '72 inches',
+  inspectionSpeed: '',
+  rollWidth: '',
   defectTypes: '',
-  erpIntegrationNeeded: 'FastReact / SAP',
-  targetTimeline: '1 - 3 Months',
+  erpIntegrationNeeded: '',
+  targetTimeline: '',
   message: '',
 }
 
@@ -49,31 +51,45 @@ const FACTORY_TYPES = [
   'Woven Textile Mill',
   'Denim Manufacturing',
   'Dyeing & Finishing Unit',
-  'Garments Manufacturing Facility',
-  'Spinning & Weaving Mill',
-  'Other Textile Operation',
+  'Garments Facility',
+  'Other',
 ]
 
 const FRAME_COUNTS = [
-  '1 Frame (Pilot / Trial)',
+  '1 Frame (Pilot)',
   '2 - 5 Frames',
   '6 - 10 Frames',
   '10+ Frames (Full Mill)',
 ]
 
+const ROLL_WIDTHS = [
+  '60 inches (152 cm)',
+  '72 inches (182 cm)',
+  '90 inches (228 cm)',
+  '120+ inches',
+  'Custom Width',
+]
+
+const SPEED_OPTIONS = [
+  '15 - 25 m/min',
+  '25 - 35 m/min',
+  '35 - 50 m/min',
+  '50+ m/min',
+]
+
 const TIMELINE_OPTIONS = [
-  'Immediate (Within 30 Days)',
+  'Immediate (< 30 Days)',
   '1 - 3 Months',
   '3 - 6 Months',
-  'Budgeting Stage / Next Fiscal',
+  'Planning Stage',
 ]
 
 const ERP_OPTIONS = [
   'FastReact / Coats Digital',
   'SAP S/4HANA',
   'Oracle NetSuite',
-  'In-House Proprietary ERP',
-  'Standalone (No ERP Integration Needed)',
+  'In-House ERP',
+  'None / Standalone',
 ]
 
 const COMMON_DEFECTS = [
@@ -90,21 +106,26 @@ export default function DeployPage() {
   const [status, setStatus] = useState<FormStatus>('editing')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [formData, setFormData] = useState<DeploymentRequest>(EMPTY_FORM)
+  const [factoryEmail, setFactoryEmail] = useState<string>('')
+  const [factoryPhone, setFactoryPhone] = useState<string>('')
   const [referenceCode, setReferenceCode] = useState<string>('')
-  const [selectedDefects, setSelectedDefects] = useState<string[]>([
-    'Holes & Tears',
-    'Oil & Dirt Stains',
-    'Yarn Breaks / Drop Stitches',
-  ])
+  const [selectedDefects, setSelectedDefects] = useState<string[]>([])
 
   const updateField =
     (field: keyof DeploymentRequest) =>
-    (
-      event: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) =>
-      setFormData((prev) => ({ ...prev, [field]: event.target.value }))
+      (
+        event: React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+      ) =>
+        setFormData((prev) => ({ ...prev, [field]: event.target.value }))
+
+  const setFieldValue = (field: keyof DeploymentRequest, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: prev[field] === value ? '' : value,
+    }))
+  }
 
   const toggleDefect = (defect: string) => {
     setSelectedDefects((prev) => {
@@ -118,11 +139,82 @@ export default function DeployPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    setStatus('sending')
     setErrorMessage(null)
+
+    if (!formData.millName?.trim()) {
+      setErrorMessage('Please enter your Mill / Factory Name.')
+      return
+    }
+    if (!factoryEmail?.trim()) {
+      setErrorMessage('Please enter the Factory Official Email Address.')
+      return
+    }
+    if (!factoryPhone?.trim()) {
+      setErrorMessage('Please enter the Factory Phone / Landline Number.')
+      return
+    }
+    if (!formData.location?.trim()) {
+      setErrorMessage('Please enter the Factory Physical Address & Location.')
+      return
+    }
+    if (!formData.contactName?.trim()) {
+      setErrorMessage('Please enter Contact Person Name.')
+      return
+    }
+    if (!formData.designation?.trim()) {
+      setErrorMessage('Please enter Designation / Job Role.')
+      return
+    }
+    if (!formData.email?.trim()) {
+      setErrorMessage('Please enter Personal Work Email Address.')
+      return
+    }
+    if (!formData.phone?.trim()) {
+      setErrorMessage('Please enter Direct Phone / WhatsApp Number.')
+      return
+    }
+    if (!formData.factoryType) {
+      setErrorMessage('Please select a Factory Sector / Operation Type.')
+      return
+    }
+    if (!formData.inspectionFramesCount) {
+      setErrorMessage('Please select Inspection Machines / Frames Count.')
+      return
+    }
+    if (!formData.rollWidth) {
+      setErrorMessage('Please select Roll / Table Width.')
+      return
+    }
+    if (!formData.inspectionSpeed) {
+      setErrorMessage('Please select Target Inspection Speed.')
+      return
+    }
+    if (selectedDefects.length === 0) {
+      setErrorMessage('Please select at least one Priority Defect Category.')
+      return
+    }
+    if (!formData.targetTimeline) {
+      setErrorMessage('Please select a Target Implementation Timeline.')
+      return
+    }
+    if (!formData.message?.trim()) {
+      setErrorMessage('Please provide Machine Frame Notes & Special Instructions.')
+      return
+    }
+
+    setStatus('sending')
+
+    const finalLocation = [
+      formData.location,
+      factoryEmail ? `Factory Email: ${factoryEmail}` : '',
+      factoryPhone ? `Factory Phone: ${factoryPhone}` : '',
+    ]
+      .filter(Boolean)
+      .join(' | ')
 
     const payload: DeploymentRequest = {
       ...formData,
+      location: finalLocation,
       defectTypes: selectedDefects.join(', '),
     }
 
@@ -132,6 +224,8 @@ export default function DeployPage() {
       setReferenceCode(result.referenceCode || 'FAB-2026-REGISTERED')
       setStatus('submitted')
       setFormData(EMPTY_FORM)
+      setFactoryEmail('')
+      setFactoryPhone('')
     } else {
       setStatus('editing')
       setErrorMessage(result.error)
@@ -142,32 +236,27 @@ export default function DeployPage() {
 
   return (
     <PageShell>
-      <div className="relative pt-28 pb-20 overflow-hidden">
+      <div className="relative pt-24 pb-20 overflow-hidden">
         {/* Background glow effects */}
         <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-accent/10 blur-[120px]" />
 
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Top navigation link */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-ink-muted hover:text-accent transition-colors mb-8 group"
+            className="inline-flex items-center gap-2.5 rounded-full border border-line-strong/60 bg-panel px-5 py-2.5 text-sm font-bold text-ink transition-all duration-300 hover:border-accent hover:text-accent hover:shadow-md mb-8 group"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back to Overview
+            <span>Back to Overview</span>
           </Link>
 
           {/* Page Banner Header */}
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-quiet px-3.5 py-1.5 text-xs font-semibold text-accent mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              RMG &amp; Textile Industry Retrofit Portal
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-ink font-heading">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-quiet px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent mb-4">
+              <Sparkles className="h-4 w-4" />
               Deploy <span className="text-gradient">FABINS</span> in Your Mill
-            </h1>
-            <p className="mt-4 text-base sm:text-lg text-ink-muted leading-relaxed">
-              Complete this technical assessment form to submit your inspection frame requirements.
-              Our R&amp;D team will evaluate your machine layout, camera mounting specs, and software integration needs.
+            </div>
+            <p className="mt-4 text-sm sm:text-base text-ink-muted leading-relaxed max-w-xl mx-auto">
+              Complete this technical assessment form. Our engineering team will evaluate your frame specifications and follow up with a deployment plan.
             </p>
           </div>
 
@@ -185,7 +274,7 @@ export default function DeployPage() {
                   <CheckCircle2 className="h-9 w-9" />
                 </div>
 
-                <h2 className="mt-6 text-2xl sm:text-3xl font-bold text-ink font-heading">
+                <h2 className="mt-6 text-2xl font-bold text-ink font-heading">
                   Assessment Request Registered!
                 </h2>
 
@@ -193,8 +282,8 @@ export default function DeployPage() {
                   Tracking Reference: {referenceCode}
                 </div>
 
-                <p className="mt-6 text-sm sm:text-base leading-relaxed text-ink-muted">
-                  Thank you for submitting your RMG mill specifications. Your request has been queued in Saturn R&amp;D Laboratory.
+                <p className="mt-6 text-sm leading-relaxed text-ink-muted">
+                  Thank you for submitting your mill specifications. Your request has been queued in Saturn R&amp;D Laboratory.
                   An engineering specialist will review your frame counts, fabric speeds, and inspection table dimensions.
                 </p>
 
@@ -235,245 +324,338 @@ export default function DeployPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 onSubmit={handleSubmit}
-                className="rounded-3xl border border-line bg-panel/85 p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-10"
+                className="rounded-3xl border border-line bg-panel/90 p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-8"
               >
-                <fieldset disabled={isSending} className="space-y-10">
-                  {/* SECTION 1: Mill & Contact Information */}
-                  <div>
-                    <div className="flex items-center gap-3 border-b border-line pb-4 mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
-                        <Building2 className="h-5 w-5" />
+                <fieldset disabled={isSending} className="space-y-8">
+                  {/* CARD 1: Mill Credentials & Representative Information */}
+                  <div className="rounded-2xl border border-line bg-panel p-6 space-y-6 shadow-sm">
+                    {/* Header */}
+                    <div className="flex items-center gap-3 border-b border-line pb-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
+                        <Building2 className="h-4.5 w-4.5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-ink font-heading">
-                          1. Company &amp; Representative Information
+                        <h3 className="text-base font-bold text-ink font-heading">
+                          1. Factory &amp; Representative Credentials
                         </h3>
-                        <p className="text-xs text-ink-soft">
-                          Contact details for technical coordination and assessment dispatch.
+                        <p className="text-xs text-ink-muted">
+                          Official factory information and technical representative contact details.
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Mill / Factory Name <span className="text-accent">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required
-                            value={formData.millName}
-                            onChange={updateField('millName')}
-                            placeholder="e.g. Apex Spinning & Knitting Mills Ltd."
-                            className="input-field pl-10"
-                          />
-                          <Factory className="absolute left-3.5 top-3.5 h-4 w-4 text-ink-soft pointer-events-none" />
+                    {/* Side-by-side grid on desktop (lg:grid-cols-2), single column on mobile */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* SUB-SECTION 1A: Factory Information (4 Fields) */}
+                      <div className="space-y-4 rounded-xl border border-line/60 bg-surface/60 p-4.5">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent border-b border-line/50 pb-2">
+                          <Factory className="h-4 w-4" />
+                          <span>Factory &amp; Organization Details</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3.5">
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Mill / Factory Name <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                value={formData.millName}
+                                onChange={updateField('millName')}
+                                placeholder="e.g. Apex Spinning & Knitting Mills Ltd."
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Factory className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Factory Official Email Address <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="email"
+                                required
+                                value={factoryEmail}
+                                onChange={(e) => setFactoryEmail(e.target.value)}
+                                placeholder="e.g. info@apextextiles.com"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Factory Desk / Landline Phone <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="tel"
+                                required
+                                value={factoryPhone}
+                                onChange={(e) => setFactoryPhone(e.target.value)}
+                                placeholder="e.g. +880 2-9900000 / PABX"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Phone className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Factory Physical Address &amp; Location <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                value={formData.location || ''}
+                                onChange={updateField('location')}
+                                placeholder="e.g. Plot 42, Board Bazar, Gazipur, Dhaka"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <MapPin className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Contact Representative Name <span className="text-accent">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required
-                            value={formData.contactName}
-                            onChange={updateField('contactName')}
-                            placeholder="e.g. Engr. Md. Rahim Ahmed"
-                            className="input-field pl-10"
-                          />
-                          <User className="absolute left-3.5 top-3.5 h-4 w-4 text-ink-soft pointer-events-none" />
+                      {/* SUB-SECTION 1B: Contact Representative Details (4 Fields) */}
+                      <div className="space-y-4 rounded-xl border border-line/60 bg-surface/60 p-4.5">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent border-b border-line/50 pb-2">
+                          <User className="h-4 w-4" />
+                          <span>Technical Representative Contact Person</span>
                         </div>
-                      </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Designation / Role
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.designation || ''}
-                          onChange={updateField('designation')}
-                          placeholder="e.g. General Manager, QA / Factory Director"
-                          className="input-field"
-                        />
-                      </div>
+                        <div className="grid grid-cols-1 gap-3.5">
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Contact Person Name <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                value={formData.contactName}
+                                onChange={updateField('contactName')}
+                                placeholder="e.g. Engr. Md. Rahim Ahmed"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <User className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Work Email Address <span className="text-accent">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={updateField('email')}
-                          placeholder="e.g. rahim.qa@apextextiles.com"
-                          className="input-field"
-                        />
-                      </div>
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Designation / Job Role <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                value={formData.designation || ''}
+                                onChange={updateField('designation')}
+                                placeholder="e.g. General Manager, QA / Director"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Briefcase className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Phone / WhatsApp Number
-                        </label>
-                        <input
-                          type="tel"
-                          value={formData.phone || ''}
-                          onChange={updateField('phone')}
-                          placeholder="e.g. +880 1700-000000"
-                          className="input-field"
-                        />
-                      </div>
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Personal Work Email Address <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="email"
+                                required
+                                value={formData.email}
+                                onChange={updateField('email')}
+                                placeholder="e.g. rahim.qa@apextextiles.com"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Factory Location / City &amp; Country
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={formData.location || ''}
-                            onChange={updateField('location')}
-                            placeholder="e.g. Gazipur, Dhaka, Bangladesh"
-                            className="input-field pl-10"
-                          />
-                          <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-ink-soft pointer-events-none" />
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1">
+                              Direct Phone / WhatsApp Number <span className="text-accent">*</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="tel"
+                                required
+                                value={formData.phone || ''}
+                                onChange={updateField('phone')}
+                                placeholder="e.g. +880 1700-000000"
+                                className="input-field pl-10 text-sm"
+                              />
+                              <Phone className="absolute left-3.5 top-3 h-4 w-4 text-ink-muted pointer-events-none" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* SECTION 2: RMG Mill Technical Specifications */}
-                  <div>
-                    <div className="flex items-center gap-3 border-b border-line pb-4 mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
-                        <Sliders className="h-5 w-5" />
+                  {/* CARD 2: Operations & Frame Setup */}
+                  <div className="rounded-2xl border border-line/80 bg-surface/50 p-6 space-y-5">
+                    <div className="flex items-center gap-3 border-b border-line pb-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
+                        <Sliders className="h-4.5 w-4.5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-ink font-heading">
-                          2. RMG &amp; Textile Operational Profile
+                        <h3 className="text-base font-bold text-ink font-heading">
+                          2. Mill Operations &amp; Machine Setup
                         </h3>
                         <p className="text-xs text-ink-soft">
-                          Machine specs helping us size camera optics and illumination arrays.
+                          Select your machine layout and operational parameters.
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div className="space-y-4">
+                      {/* Operation Type Pills */}
                       <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Factory Sector / Operation Type
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                          Factory Sector / Operation Type <span className="text-accent">*</span>
                         </label>
-                        <select
-                          value={formData.factoryType || ''}
-                          onChange={updateField('factoryType')}
-                          className="input-field bg-panel"
-                        >
-                          {FACTORY_TYPES.map((type) => (
-                            <option key={type} value={type}>
-                              {type}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="flex flex-wrap gap-2">
+                          {FACTORY_TYPES.map((type) => {
+                            const active = formData.factoryType === type
+                            return (
+                              <button
+                                key={type}
+                                type="button"
+                                onClick={() => setFieldValue('factoryType', type)}
+                                className={cn(
+                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
+                                  active
+                                    ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
+                                    : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
+                                )}
+                              >
+                                {active ? '✓ ' : ''}{type}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
 
+                      {/* Frame Count Pills */}
                       <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Inspection Machines / Frames Count
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                          Inspection Machines / Frames Count <span className="text-accent">*</span>
                         </label>
-                        <select
-                          value={formData.inspectionFramesCount || ''}
-                          onChange={updateField('inspectionFramesCount')}
-                          className="input-field bg-panel"
-                        >
-                          {FRAME_COUNTS.map((cnt) => (
-                            <option key={cnt} value={cnt}>
-                              {cnt}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="flex flex-wrap gap-2">
+                          {FRAME_COUNTS.map((cnt) => {
+                            const active = formData.inspectionFramesCount === cnt
+                            return (
+                              <button
+                                key={cnt}
+                                type="button"
+                                onClick={() => setFieldValue('inspectionFramesCount', cnt)}
+                                className={cn(
+                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
+                                  active
+                                    ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
+                                    : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
+                                )}
+                              >
+                                {active ? '✓ ' : ''}{cnt}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Fabric Types Processed
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.fabricTypes || ''}
-                          onChange={updateField('fabricTypes')}
-                          placeholder="e.g. Single Jersey, Interlock, Rib, Fleece, Denim"
-                          className="input-field"
-                        />
+                      {/* Roll Width & Inspection Speed Pills */}
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-2">
+                        <div>
+                          <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                            Roll / Table Width <span className="text-accent">*</span>
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {ROLL_WIDTHS.map((width) => {
+                              const active = formData.rollWidth === width
+                              return (
+                                <button
+                                  key={width}
+                                  type="button"
+                                  onClick={() => setFieldValue('rollWidth', width)}
+                                  className={cn(
+                                    'rounded-full px-3 py-1 text-xs font-semibold transition-all border cursor-pointer',
+                                    active
+                                      ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
+                                      : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
+                                  )}
+                                >
+                                  {active ? '✓ ' : ''}{width}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                            Target Inspection Speed <span className="text-accent">*</span>
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {SPEED_OPTIONS.map((spd) => {
+                              const active = formData.inspectionSpeed === spd
+                              return (
+                                <button
+                                  key={spd}
+                                  type="button"
+                                  onClick={() => setFieldValue('inspectionSpeed', spd)}
+                                  className={cn(
+                                    'rounded-full px-3 py-1 text-xs font-semibold transition-all border cursor-pointer',
+                                    active
+                                      ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
+                                      : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
+                                  )}
+                                >
+                                  {active ? '✓ ' : ''}{spd}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Daily / Monthly Production Volume
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.dailyProductionVolume || ''}
-                          onChange={updateField('dailyProductionVolume')}
-                          placeholder="e.g. 25,000 yards/day (~80 rolls)"
-                          className="input-field"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Target Inspection Speed
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.inspectionSpeed || ''}
-                          onChange={updateField('inspectionSpeed')}
-                          placeholder="e.g. 15 - 30 meters / minute"
-                          className="input-field"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                          Roll / Table Width (Inches / cm)
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.rollWidth || ''}
-                          onChange={updateField('rollWidth')}
-                          placeholder="e.g. 72 inches (182 cm) open width"
-                          className="input-field"
-                        />
-                      </div>
                     </div>
                   </div>
 
-                  {/* SECTION 3: Inspection Requirements & Integration */}
-                  <div>
-                    <div className="flex items-center gap-3 border-b border-line pb-4 mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
-                        <Cpu className="h-5 w-5" />
+                  {/* CARD 3: Inspection Focus & Software Integration */}
+                  <div className="rounded-2xl border border-line/80 bg-surface/50 p-6 space-y-5">
+                    <div className="flex items-center gap-3 border-b border-line pb-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
+                        <Cpu className="h-4.5 w-4.5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-ink font-heading">
-                          3. Defect Inspection &amp; System Integration
+                        <h3 className="text-base font-bold text-ink font-heading">
+                          3. Defect Priorities &amp; Timeline
                         </h3>
                         <p className="text-xs text-ink-soft">
-                          Specify target defect categories and software ecosystem requirements.
+                          Select priority defect categories and your target implementation schedule.
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
+                      {/* Defect Categories */}
                       <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-3">
-                          Priority Defect Categories to Detect
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                          Priority Defect Categories to Detect <span className="text-accent">*</span> (Select all that apply)
                         </label>
-                        <div className="flex flex-wrap gap-2.5">
+                        <div className="flex flex-wrap gap-2">
                           {COMMON_DEFECTS.map((defect) => {
                             const isSelected = selectedDefects.includes(defect)
                             return (
@@ -482,9 +664,9 @@ export default function DeployPage() {
                                 type="button"
                                 onClick={() => toggleDefect(defect)}
                                 className={cn(
-                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border',
+                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
                                   isSelected
-                                    ? 'border-accent bg-accent-quiet text-accent shadow-[0_4px_12px_-4px_rgba(8,145,178,0.4)]'
+                                    ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
                                     : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong'
                                 )}
                               >
@@ -496,53 +678,44 @@ export default function DeployPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                            ERP / Software System Integration
-                          </label>
-                          <select
-                            value={formData.erpIntegrationNeeded || ''}
-                            onChange={updateField('erpIntegrationNeeded')}
-                            className="input-field bg-panel"
-                          >
-                            {ERP_OPTIONS.map((erp) => (
-                              <option key={erp} value={erp}>
-                                {erp}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2">
-                            Target Implementation Timeline
-                          </label>
-                          <select
-                            value={formData.targetTimeline || ''}
-                            onChange={updateField('targetTimeline')}
-                            className="input-field bg-panel"
-                          >
-                            {TIMELINE_OPTIONS.map((tl) => (
-                              <option key={tl} value={tl}>
-                                {tl}
-                              </option>
-                            ))}
-                          </select>
+                      {/* Implementation Timeline Pills */}
+                      <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                          Target Implementation Timeline <span className="text-accent">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {TIMELINE_OPTIONS.map((tl) => {
+                            const active = formData.targetTimeline === tl
+                            return (
+                              <button
+                                key={tl}
+                                type="button"
+                                onClick={() => setFieldValue('targetTimeline', tl)}
+                                className={cn(
+                                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
+                                  active
+                                    ? 'border-accent bg-accent-quiet text-accent shadow-sm ring-1 ring-accent/30'
+                                    : 'border-line bg-panel-2 text-ink-muted hover:border-line-strong hover:text-ink'
+                                )}
+                              >
+                                {active ? '✓ ' : ''}{tl}
+                              </button>
+                            )
+                          })}
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* SECTION 4: Technical Notes & Comments */}
-                  <div>
-                    <div className="flex items-center gap-3 border-b border-line pb-4 mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
-                        <Layers className="h-5 w-5" />
+                  {/* CARD 4: Additional Notes / Frame Setup */}
+                  <div className="rounded-2xl border border-line/80 bg-surface/50 p-6 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-line pb-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-quiet text-accent border border-accent/20">
+                        <Layers className="h-4.5 w-4.5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-ink font-heading">
-                          4. Machine Frame Notes &amp; Special Instructions
+                        <h3 className="text-base font-bold text-ink font-heading">
+                          4. Machine Frame Notes &amp; Special Instructions <span className="text-accent">*</span>
                         </h3>
                         <p className="text-xs text-ink-soft">
                           Provide details about existing backlight tables, roller speed encoders, or mill constraints.
@@ -550,15 +723,14 @@ export default function DeployPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <textarea
-                        rows={4}
-                        value={formData.message || ''}
-                        onChange={updateField('message')}
-                        placeholder="Describe your current fabric inspection frame setups, lighting preference (backlit/toplit), or custom technical requests..."
-                        className="input-field leading-relaxed resize-y"
-                      />
-                    </div>
+                    <textarea
+                      rows={3}
+                      required
+                      value={formData.message || ''}
+                      onChange={updateField('message')}
+                      placeholder="Describe your current fabric inspection frame setups, lighting preference (backlit/toplit), or custom technical requests..."
+                      className="input-field text-sm leading-relaxed resize-y"
+                    />
                   </div>
 
                   {/* Error display */}
@@ -575,26 +747,26 @@ export default function DeployPage() {
                   {/* Submit Button */}
                   <div className="pt-4 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-ink-soft">
-                      Submitting triggers automated reference registration and R&amp;D team notification.
+                      Submitting triggers reference registration and automated R&amp;D team notification.
                     </p>
 
                     <button
                       type="submit"
                       disabled={isSending}
                       className={cn(
-                        'btn btn-primary w-full sm:w-auto px-8 py-3.5 text-sm font-bold shadow-lg',
+                        'btn btn-primary w-full sm:w-auto px-6 py-2.5 text-xs font-semibold shadow-md',
                         isSending && 'opacity-70 cursor-not-allowed'
                       )}
                     >
                       {isSending ? (
                         <span className="flex items-center gap-2">
-                          <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Registering Assessment Enquiry...
+                          <span className="h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Submitting Request...
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
-                          Submit RMG Assessment Request
-                          <Send className="h-4 w-4" />
+                          Submit Request
+                          <Send className="h-3.5 w-3.5" />
                         </span>
                       )}
                     </button>
