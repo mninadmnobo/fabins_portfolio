@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Menu, X, Rocket } from 'lucide-react'
+import { Menu, X, Mail } from 'lucide-react'
 import { NAV_LINKS, PRIMARY_CTA, SECTION_IDS } from '@/lib/data/site'
 import { scrollToSection, useActiveSection, useIsScrolled } from '@/lib/scroll'
 import { cn } from '@/lib/utils'
@@ -99,16 +99,14 @@ export const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Dedicated Deploy CTA */}
+          {/* CTA — scrolls to the homepage contact form */}
           <Link
-            href="/deploy"
-            className={cn(
-              'btn hidden !px-5 !py-2.5 text-[13px] transition-all duration-300 sm:inline-flex items-center gap-1.5',
-              isDeployPage ? 'btn-primary' : 'btn-primary'
-            )}
+            href={isDeployPage ? '/#contact' : '#contact'}
+            onClick={(e) => !isDeployPage && handleNavigate(e, 'contact')}
+            className="btn btn-primary hidden !px-5 !py-2.5 text-[13px] sm:inline-flex items-center gap-1.5"
           >
-            <Rocket className="h-3.5 w-3.5" />
-            <span>Deploy FABINS</span>
+            <Mail className="h-3.5 w-3.5" />
+            <span>Let&#39;s Connect</span>
           </Link>
 
           <button
@@ -147,12 +145,12 @@ export const Navbar = () => {
           ))}
 
           <Link
-            href="/deploy"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="btn btn-primary mt-2 w-full justify-center text-sm font-bold transition-all duration-300 flex items-center gap-2"
+            href={isDeployPage ? '/#contact' : '#contact'}
+            onClick={(e) => { if (!isDeployPage) handleNavigate(e, 'contact'); setIsMobileMenuOpen(false); }}
+            className="btn btn-primary mt-2 w-full justify-center text-sm font-bold flex items-center gap-2"
           >
-            <Rocket className="h-4 w-4" />
-            <span>Deploy FABINS</span>
+            <Mail className="h-4 w-4" />
+            <span>Let&#39;s Connect</span>
           </Link>
         </div>
       )}
