@@ -64,6 +64,50 @@ public class DeploymentRequest {
     @Column(length = 5000)
     private String message;
 
+    /** Optional designation / job title of contact representative. */
+    @Column(length = 150)
+    private String designation;
+
+    /** Factory location / city / country. */
+    @Column(length = 200)
+    private String location;
+
+    /** Type of RMG / Textile factory. */
+    @Column(name = "factory_type", length = 100)
+    private String factoryType;
+
+    /** Number of inspection frames to retrofit/upgrade. */
+    @Column(name = "inspection_frames_count", length = 50)
+    private String inspectionFramesCount;
+
+    /** Types of fabric processed. */
+    @Column(name = "fabric_types", length = 500)
+    private String fabricTypes;
+
+    /** Daily/monthly production volume. */
+    @Column(name = "daily_production_volume", length = 100)
+    private String dailyProductionVolume;
+
+    /** Target inspection speed. */
+    @Column(name = "inspection_speed", length = 50)
+    private String inspectionSpeed;
+
+    /** Roll width or table width. */
+    @Column(name = "roll_width", length = 50)
+    private String rollWidth;
+
+    /** Primary defect types of concern. */
+    @Column(name = "defect_types", length = 500)
+    private String defectTypes;
+
+    /** Target ERP system for software integration. */
+    @Column(name = "erp_integration_needed", length = 100)
+    private String erpIntegrationNeeded;
+
+    /** Implementation timeline. */
+    @Column(name = "target_timeline", length = 100)
+    private String targetTimeline;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private DeploymentRequestStatus status;
@@ -82,34 +126,57 @@ public class DeploymentRequest {
     protected DeploymentRequest() {
     }
 
-    private DeploymentRequest(String millName, String contactName, String email,
-                              String phone, String message) {
+    private DeploymentRequest(String millName, String contactName, String designation, String email,
+                              String phone, String location, String factoryType,
+                              String inspectionFramesCount, String fabricTypes,
+                              String dailyProductionVolume, String inspectionSpeed,
+                              String rollWidth, String defectTypes, String erpIntegrationNeeded,
+                              String targetTimeline, String message) {
         this.millName = millName;
         this.contactName = contactName;
+        this.designation = designation;
         this.email = email;
         this.phone = phone;
+        this.location = location;
+        this.factoryType = factoryType;
+        this.inspectionFramesCount = inspectionFramesCount;
+        this.fabricTypes = fabricTypes;
+        this.dailyProductionVolume = dailyProductionVolume;
+        this.inspectionSpeed = inspectionSpeed;
+        this.rollWidth = rollWidth;
+        this.defectTypes = defectTypes;
+        this.erpIntegrationNeeded = erpIntegrationNeeded;
+        this.targetTimeline = targetTimeline;
         this.message = message;
         this.status = DeploymentRequestStatus.NEW;
     }
 
     /**
      * Creates a newly submitted request.
-     *
-     * <p>The only way to build one, which guarantees every request starts at
-     * {@link DeploymentRequestStatus#NEW} — a caller cannot construct one that
-     * is already {@code CLOSED}.
+     */
+    public static DeploymentRequest submit(String millName, String contactName, String designation,
+                                           String email, String phone, String location,
+                                           String factoryType, String inspectionFramesCount,
+                                           String fabricTypes, String dailyProductionVolume,
+                                           String inspectionSpeed, String rollWidth,
+                                           String defectTypes, String erpIntegrationNeeded,
+                                           String targetTimeline, String message) {
+        return new DeploymentRequest(millName, contactName, designation, email, phone, location,
+                factoryType, inspectionFramesCount, fabricTypes, dailyProductionVolume,
+                inspectionSpeed, rollWidth, defectTypes, erpIntegrationNeeded, targetTimeline, message);
+    }
+
+    /**
+     * Backward-compatible overload for legacy callers or minimal payloads.
      */
     public static DeploymentRequest submit(String millName, String contactName, String email,
                                            String phone, String message) {
-        return new DeploymentRequest(millName, contactName, email, phone, message);
+        return new DeploymentRequest(millName, contactName, null, email, phone, null,
+                null, null, null, null, null, null, null, null, null, message);
     }
 
     /**
      * Moves this request to a new stage of the follow-up process.
-     *
-     * <p>Status is changed through this method rather than a plain setter so
-     * that any future rule — forbidding a transition out of {@code CLOSED},
-     * say, or recording who made the change — has one place to live.
      */
     public void changeStatus(DeploymentRequestStatus newStatus) {
         this.status = newStatus;
@@ -127,12 +194,56 @@ public class DeploymentRequest {
         return contactName;
     }
 
+    public String getDesignation() {
+        return designation;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public String getPhone() {
         return phone;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getFactoryType() {
+        return factoryType;
+    }
+
+    public String getInspectionFramesCount() {
+        return inspectionFramesCount;
+    }
+
+    public String getFabricTypes() {
+        return fabricTypes;
+    }
+
+    public String getDailyProductionVolume() {
+        return dailyProductionVolume;
+    }
+
+    public String getInspectionSpeed() {
+        return inspectionSpeed;
+    }
+
+    public String getRollWidth() {
+        return rollWidth;
+    }
+
+    public String getDefectTypes() {
+        return defectTypes;
+    }
+
+    public String getErpIntegrationNeeded() {
+        return erpIntegrationNeeded;
+    }
+
+    public String getTargetTimeline() {
+        return targetTimeline;
     }
 
     public String getMessage() {

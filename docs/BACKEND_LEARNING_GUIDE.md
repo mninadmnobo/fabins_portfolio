@@ -100,30 +100,33 @@ Here is a complete breakdown of every directory and file in the backend reposito
 
 ---
 
-### 7. Entity & Enum Layer (`com.fabins.entity`)
+### 7. Entity, Enum & Flyway Migration Layer (`com.fabins.entity`, `db/migration`)
 
-* `DeploymentRequest.java`: JPA `@Entity` mapped to database table `deployment_requests`.
-* `DeploymentRequestStatus.java`: Enum (`PENDING`, `IN_REVIEW`, `APPROVED`, `REJECTED`, `ARCHIVED`).
+* `DeploymentRequest.java`: JPA `@Entity` mapped to database table `deployment_request`. Uses UUID primary keys and auditing listener for UTC timestamps.
+* `DeploymentRequestStatus.java`: Enum (`NEW`, `IN_REVIEW`, `CONTACTED`, `CLOSED`).
+* `db/migration/V1__create_deployment_request.sql`: Base Flyway migration creating `deployment_request` table.
+* `db/migration/V2__add_rmg_industry_fields.sql`: Schema upgrade adding RMG industry columns (`designation`, `location`, `factory_type`, `inspection_frames_count`, `fabric_types`, `daily_production_volume`, `inspection_speed`, `roll_width`, `defect_types`, `erp_integration_needed`, `target_timeline`).
 
 ---
 
 ### 8. Exception & Security Layer
 
-* `GlobalExceptionHandler.java`: `@RestControllerAdvice` converting runtime errors to RFC 9457 standard JSON.
-* `SecurityConfig.java`: Spring Security CORS, CSRF, and authentication rules.
+* `GlobalExceptionHandler.java`: `@RestControllerAdvice` converting validation errors and runtime exceptions to RFC 9457 standard problem+json.
+* `SecurityConfig.java`: Spring Security 6 CORS policy control, CSRF protection, and endpoint role isolation.
 
 ---
 
-## ⚡ Step-by-Step Flow: What Happens When a Visitor Submits a Request?
+## ⚡ Step-by-Step Flow: What Happens When a Visitor Submits an RMG Request?
 
-1. User clicks "Request Assessment" on the website form.
+1. Visitor opens the RMG Assessment Portal at `http://localhost:3000/deploy` and fills out the mill specifications.
 2. React calls `submitDeploymentRequest()` in `frontend/lib/api/contact.ts`.
 3. HTTP POST Request arrives at `http://localhost:8080/api/v1/deployment-requests`.
-4. `DeploymentRequestController` validates the JSON input.
+4. `DeploymentRequestController` validates the JSON input via `@Valid CreateDeploymentRequest`.
 5. Controller passes DTO to `DeploymentRequestServiceImpl`.
 6. Service converts DTO to Entity via `DeploymentRequestMapper`.
 7. Service calls `DeploymentRequestRepository.save(entity)`.
-8. Spring Data JPA executes SQL `INSERT INTO deployment_requests ...` into H2/PostgreSQL database.
-9. HTTP 201 Created JSON response is returned to browser.
+8. Spring Data JPA executes SQL `INSERT INTO deployment_request ...` into database (verified by Flyway V1 & V2 migrations).
+9. Service triggers asynchronous `@Async` email notification to R&D team and sender confirmation via Brevo REST API / SMTPS.
+10. HTTP 201 Created JSON response (carrying tracking reference code `FAB-2026-XXXXXXXX`) is returned to the browser.
 
 Happy Learning & Coding! 🚀

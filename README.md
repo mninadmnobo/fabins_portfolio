@@ -23,6 +23,17 @@ Instead of importing expensive foreign inspection machines that require replacin
 
 ---
 
+## 🏬 RMG Industry Assessment Portal (`/deploy`)
+
+To accommodate Ready-Made Garment (RMG) factories, spinning & weaving mills, and denim manufacturing facilities, FABINS provides a dedicated, multi-section assessment portal at **`/deploy`**.
+
+The assessment portal collects critical machine-level parameters required for optical camera sizing and AI model tuning:
+- **Factory & Contact Profile**: Mill Name, Representative, Designation, Email, Phone, Location
+- **Operational Parameters**: Factory Sector, Inspection Frame Count, Fabric Types (Knits, Denim, Woven), Production Volume, Inspection Speed (m/min), Roll/Table Width (inches)
+- **Quality & Integration Needs**: Defect Focus (Holes, Stains, Slubs, Yarn Breaks, Drop Stitches), ERP Software Integration (FastReact, SAP, Oracle), Target Timeline
+
+---
+
 ## 🏛️ System Architecture
 
 This repository is structured as a clean **Full-Stack Monorepo** comprising a high-performance Next.js 16 web application and a production-grade Spring Boot 3 REST API backend.
@@ -31,13 +42,15 @@ This repository is structured as a clean **Full-Stack Monorepo** comprising a hi
  ┌─────────────────────────────────────────────────────────────────────────────┐
  │                             WEB CLIENT (BROWSER)                            │
  │  Next.js 16 App Router · React 19 · Framer Motion · Tailwind CSS v4          │
+ │  • Primary Landing Page (/)                                                 │
+ │  • Dedicated RMG Assessment Portal (/deploy)                                │
  └──────────────────────────────────────┬──────────────────────────────────────┘
                                         │
                                         │ HTTP REST / JSON
                                         ▼
  ┌─────────────────────────────────────────────────────────────────────────────┐
  │                         SPRING BOOT 3 REST BACKEND                          │
- │  Java 21 · Spring Security · Spring Data JPA · MapStruct · RFC 9457 Errors  │
+ │  Java 21 · Spring Security · Spring Data JPA · Flyway V2 · RFC 9457 Errors  │
  └──────────────────────────────────────┬──────────────────────────────────────┘
                                         │
                                         │ JDBC SQL
@@ -54,15 +67,15 @@ This repository is structured as a clean **Full-Stack Monorepo** comprising a hi
 
 ```text
 fabins_portfolio/
-├── frontend/                 # Next.js 16 Single-Page Marketing & Product Web App
-│   ├── app/                  # App Router: layout, page, globals.css tokens
-│   ├── components/           # UI Primitives, Sections, Layout Shell
-│   ├── lib/                  # Data fixtures, Selectors (DAL), API boundary
+├── frontend/                 # Next.js 16 Web Application
+│   ├── app/                  # App Router: layout, home (/), deploy portal (/deploy)
+│   ├── components/           # UI Primitives, Gateway Sections, Navbar & Footer Shell
+│   ├── lib/                  # Data fixtures, Selectors, API boundary (contact.ts)
 │   └── public/               # Static assets — logos, photography, favicon
 │
 ├── backend/                  # Spring Boot 3.4 REST API Service
-│   ├── src/main/java/        # Controllers, Services, Repositories, Entities, DTOs
-│   ├── src/main/resources/   # application.yml config, Flyway migrations, email templates
+│   ├── src/main/java/        # Controllers, Services, Repositories, Entities, DTOs, Mappers
+│   ├── src/main/resources/   # application.yml config, Flyway migrations (V1, V2), email templates
 │   ├── src/test/java/        # JUnit 5 suite — endpoint, security, and email tests
 │   ├── pom.xml               # Maven dependencies & build configuration
 │   └── mvnw / mvnw.cmd       # Cross-platform Maven Wrappers
@@ -70,7 +83,7 @@ fabins_portfolio/
 ├── .github/workflows/        # ⚙️ CI/CD — build, test, and deploy pipeline
 │
 └── docs/                     # 📚 Central Documentation & Learning Guides
-    ├── FRONTEND_ARCHITECTURE_GUIDE.md  # Complete React/Next.js learning guide
+    ├── FRONTEND_ARCHITECTURE_GUIDE.md  # Complete React/Next.js architecture guide
     ├── BACKEND_LEARNING_GUIDE.md       # Complete Spring Boot & JPA learning guide
     └── CICD_AND_DEPLOYMENT.md          # Deployment, custom domains, lessons learned
 ```
@@ -109,6 +122,7 @@ pnpm dev
 ```
 
 * Open **`http://localhost:3000`** in your web browser.
+* Open **`http://localhost:3000/deploy`** for the RMG Industry Assessment Portal.
 
 ---
 
@@ -116,11 +130,12 @@ pnpm dev
 
 | Tier | Component | Description |
 | :--- | :--- | :--- |
-| **Frontend UI** | Next.js 16 (App Router) | High-performance React 19 SSR/SSG rendering framework |
+| **Frontend UI** | Next.js 16 (App Router) | High-performance React 19 SSR/SSG rendering framework with dedicated `/deploy` route |
 | **Styling** | Tailwind CSS v4 | Utility-first CSS engine with custom cyber-grid design tokens |
 | **Animations** | Framer Motion | Fluid scroll entrance presets & interactive modal transitions |
 | **Backend API** | Spring Boot 3.4 | Production-grade Java 21 REST API framework |
 | **Security** | Spring Security 6 | CORS policy control, CSRF protection, and endpoint role isolation |
+| **Database Migrations** | Flyway 10 | Versioned SQL database migrations (`V1`, `V2` schema upgrades) |
 | **Persistence** | Spring Data JPA | Automatic SQL mapping for H2 (in-memory) & PostgreSQL |
 | **Documentation** | OpenAPI 3.0 / Swagger | Automated interactive REST API documentation |
 
@@ -128,11 +143,11 @@ pnpm dev
 
 ## 📚 Central Learning & Educational Documentation
 
-This repository was specifically built as a **flagship educational reference** for students and developers learning full-stack web and backend development:
+This repository was specifically built as an **international educational reference** for developers learning full-stack web and backend architecture:
 
-* 📖 **[Frontend Architecture Guide](docs/FRONTEND_ARCHITECTURE_GUIDE.md)**: Teaches clean 3-layer React architecture, state composition, data selectors, and custom design primitives.
-* ☕ **[Spring Boot Learning Guide](docs/BACKEND_LEARNING_GUIDE.md)**: Line-by-line explanation of Spring Boot annotations, Controller-Service-Repository patterns, DTO mapping, and RFC 9457 error handling.
-* 🚀 **[CI/CD & Deployment Guide](docs/CICD_AND_DEPLOYMENT.md)**: Production topology, the GitHub Actions pipeline, custom domain setup (DNS, CORS, SPF/DKIM/DMARC), and the two deployment failures that cost the most time to diagnose — cloud PostgreSQL URL parsing and PaaS SMTP port blocking.
+* 📖 **[Frontend Architecture Guide](docs/FRONTEND_ARCHITECTURE_GUIDE.md)**: Teaches clean 3-layer React architecture, route composition (`/deploy`), state management, and custom design primitives.
+* ☕ **[Spring Boot Learning Guide](docs/BACKEND_LEARNING_GUIDE.md)**: Line-by-line explanation of Spring Boot annotations, Flyway migrations, DTO mapping, and RFC 9457 error handling.
+* 🚀 **[CI/CD & Deployment Guide](docs/CICD_AND_DEPLOYMENT.md)**: Production topology, GitHub Actions, custom domain setup (DNS, CORS, SPF/DKIM/DMARC), and PaaS deployment troubleshooting.
 
 ---
 
@@ -140,8 +155,8 @@ This repository was specifically built as a **flagship educational reference** f
 
 | Method | Endpoint Path | Access | Purpose |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/deployment-requests` | **Public** | Submit deployment assessment request from website form |
-| `GET` `POST` | `/api/v1/deployment-requests/{id}/acknowledge` | **Public** | One-click acknowledge link embedded in the R&D notification email — moves the request to `IN_REVIEW` and notifies the sender |
+| `POST` | `/api/v1/deployment-requests` | **Public** | Submit RMG deployment assessment request with full machine specs |
+| `GET` `POST` | `/api/v1/deployment-requests/{id}/acknowledge` | **Public** | One-click acknowledge link embedded in the R&D notification email — moves request to `IN_REVIEW` |
 | `GET` | `/api/v1/deployment-requests` | Admin | List deployment requests (paginated, filterable by status) |
 | `GET` | `/api/v1/deployment-requests/{id}` | Admin | Retrieve details of a specific deployment request |
 | `PATCH` | `/api/v1/deployment-requests/{id}/status` | Admin | Update request status (`NEW` ➔ `IN_REVIEW` ➔ `CONTACTED` ➔ `CLOSED`) |
@@ -158,5 +173,5 @@ Developed by **Saturn Textiles Limited — Research & Development Department**:
 ---
 
 <p align="center">
-  <sub>Built with precision for the Ready-Made Garment (RMG) export industry of Bangladesh.</sub>
+  <sub>Built with international precision for the Ready-Made Garment (RMG) export industry.</sub>
 </p>

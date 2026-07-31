@@ -28,10 +28,22 @@ public record DeploymentRequestResponse(
 
         String millName,
         String contactName,
+        String designation,
         String email,
 
         @Schema(description = "Null when the submitter did not provide one")
         String phone,
+
+        String location,
+        String factoryType,
+        String inspectionFramesCount,
+        String fabricTypes,
+        String dailyProductionVolume,
+        String inspectionSpeed,
+        String rollWidth,
+        String defectTypes,
+        String erpIntegrationNeeded,
+        String targetTimeline,
 
         @Schema(description = "Null when the submitter left it blank")
         String message,

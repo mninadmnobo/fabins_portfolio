@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Rocket } from 'lucide-react'
 import { NAV_LINKS, PRIMARY_CTA, SECTION_IDS } from '@/lib/data/site'
 import { scrollToSection, useActiveSection, useIsScrolled } from '@/lib/scroll'
 import { cn } from '@/lib/utils'
@@ -17,24 +19,29 @@ import { Wordmark } from '@/components/ui/Wordmark'
  * ─── BEHAVIOUR ──────────────────────────────────────────────────────────────
  *   - `useIsScrolled` swaps the bar from translucent to solid once the page moves.
  *   - `useActiveSection` highlights the link for the section in view.
- *   - Clicks are intercepted so navigation scrolls smoothly with the header
- *     offset applied, instead of jumping. The `href="#id"` is kept so the links
- *     still work without JavaScript and can be opened in a new tab.
+ *   - `usePathname` detects if the user is on the dedicated `/deploy` route,
+ *     seamlessly delegating hash navigation back to `/#section`.
+ *   - Clicks are intercepted on the single-page home view so navigation scrolls
+ *     smoothly with header offset applied instead of jumping.
  *
  * The sliding highlight behind the active link is a single element shared
- * between links via Framer Motion's `layoutId` — that is what makes it glide
- * from one link to the next rather than cross-fade.
+ * between links via Framer Motion's `layoutId` — gliding smoothly between links.
  */
-
 export const Navbar = () => {
   const isScrolled = useIsScrolled()
   const activeSection = useActiveSection(SECTION_IDS)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const isDeployPage = pathname === '/deploy'
 
   /** Scrolls to a section and closes the mobile menu if it is open. */
   const handleNavigate = (event: React.MouseEvent, sectionId: string) => {
-    event.preventDefault()
     setIsMobileMenuOpen(false)
+    if (isDeployPage) {
+      // Allow standard Next.js route navigation to home with hash anchor
+      return
+    }
+    event.preventDefault()
     scrollToSection(sectionId)
   }
 
@@ -50,24 +57,25 @@ export const Navbar = () => {
             : 'border-line/60 bg-panel/45'
         )}
       >
-        {/* Brand — scrolls back to the top of the page. */}
-        <a
-          href="#home"
+        {/* Brand — scrolls back to top or home */}
+        <Link
+          href="/#home"
           onClick={(event) => handleNavigate(event, 'home')}
           className="group flex shrink-0 items-center gap-2 rounded-full py-1 pl-1 pr-3 transition-all duration-200 hover:-translate-y-0.5 hover:bg-panel-2"
         >
           <Wordmark size="sm" />
-        </a>
+        </Link>
 
-        {/* Desktop navigation. Collapses into the mobile menu below `lg`. */}
+        {/* Desktop navigation */}
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
-            const isActive = activeSection === link.id
+            const isActive = !isDeployPage && activeSection === link.id
+            const href = isDeployPage ? `/#${link.id}` : `#${link.id}`
 
             return (
-              <a
+              <Link
                 key={link.id}
-                href={`#${link.id}`}
+                href={href}
                 onClick={(event) => handleNavigate(event, link.id)}
                 aria-current={isActive ? 'true' : undefined}
                 className={cn(
@@ -77,10 +85,6 @@ export const Navbar = () => {
                     : 'text-ink-muted hover:bg-accent-quiet hover:text-accent'
                 )}
               >
-                {/*
-                  Shared `layoutId` means Framer Motion animates this one pill
-                  between links rather than fading a new one in per link.
-                */}
                 {isActive && (
                   <motion.span
                     layoutId="nav-pill"
@@ -88,25 +92,24 @@ export const Navbar = () => {
                     transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
-                {/* Sits above the pill so the label stays readable. */}
                 <span className="relative z-10">{link.name}</span>
-              </a>
+              </Link>
             )
           })}
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Contact CTA — fills in solid once the contact section is reached. */}
-          <a
-            href={`#${PRIMARY_CTA.id}`}
-            onClick={(event) => handleNavigate(event, PRIMARY_CTA.id)}
+          {/* Dedicated Deploy CTA */}
+          <Link
+            href="/deploy"
             className={cn(
-              'btn hidden !px-5 !py-2.5 text-[13px] transition-all duration-300 sm:inline-flex',
-              activeSection === PRIMARY_CTA.id ? 'btn-primary' : 'btn-secondary'
+              'btn hidden !px-5 !py-2.5 text-[13px] transition-all duration-300 sm:inline-flex items-center gap-1.5',
+              isDeployPage ? 'btn-primary' : 'btn-primary'
             )}
           >
-            {PRIMARY_CTA.name}
-          </a>
+            <Rocket className="h-3.5 w-3.5" />
+            <span>Deploy FABINS</span>
+          </Link>
 
           <button
             type="button"
@@ -121,38 +124,36 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu — same destinations, stacked. Closes on any selection. */}
+      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
           className="mx-auto mt-2 max-w-7xl rounded-3xl border border-line bg-panel/95 p-3 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl lg:hidden"
         >
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.id}
-              href={`#${link.id}`}
+              href={isDeployPage ? `/#${link.id}` : `#${link.id}`}
               onClick={(event) => handleNavigate(event, link.id)}
               className={cn(
                 'flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200',
-                activeSection === link.id
+                !isDeployPage && activeSection === link.id
                   ? 'bg-gradient-to-r from-[var(--btn-from)] to-[var(--btn-to)] text-[var(--btn-ink)] shadow-[0_8px_25px_-8px_var(--btn-from)]'
                   : 'text-ink-muted hover:bg-panel-2 hover:text-ink'
               )}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
 
-          <a
-            href={`#${PRIMARY_CTA.id}`}
-            onClick={(event) => handleNavigate(event, PRIMARY_CTA.id)}
-            className={cn(
-              'btn mt-2 w-full transition-all duration-300',
-              activeSection === PRIMARY_CTA.id ? 'btn-primary' : 'btn-secondary'
-            )}
+          <Link
+            href="/deploy"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="btn btn-primary mt-2 w-full justify-center text-sm font-bold transition-all duration-300 flex items-center gap-2"
           >
-            {PRIMARY_CTA.name}
-          </a>
+            <Rocket className="h-4 w-4" />
+            <span>Deploy FABINS</span>
+          </Link>
         </div>
       )}
     </header>

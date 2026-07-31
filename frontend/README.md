@@ -59,16 +59,19 @@ The site is **statically rendered and light-mode only**. All content is built in
 app/
   globals.css     Design tokens + shared classes. Read the header comment first.
   layout.tsx      Root layout, page metadata, theming decision
-  page.tsx        The page: which sections render, in what order
+  page.tsx        The main landing page: section composition & overview
+  deploy/
+    page.tsx      Dedicated RMG Industry Deployment Assessment Portal (/deploy)
 
 components/
   layout/         The frame around the content
     PageShell       Navbar + main + Footer + ambient background
-    Navbar          Floating pill header, scroll-spy, mobile menu
-    Footer          Brand, navigation, innovator list
+    Navbar          Floating pill header, scroll-spy, mobile menu, /deploy awareness
+    Footer          Brand, navigation, innovator list, /deploy link
 
   sections/       One file per page section, named for its section.
                   Each composes primitives; none defines its own layout shell.
+                  ContactSection is the Gateway Portal connecting to /deploy.
 
   ui/             Reusable primitives — the design system
     Section         Section shell: vertical rhythm + centred container

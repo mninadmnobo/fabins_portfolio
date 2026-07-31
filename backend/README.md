@@ -53,17 +53,28 @@ Base path `/api/v1`. All payloads are JSON.
 
 `GET` supports `?status=NEW`, `?page=0`, `?size=20`.
 
-Submitting a request:
+Submitting a request (with RMG Industry parameters):
 
 ```bash
 curl -i -X POST http://localhost:8080/api/v1/deployment-requests \
   -H 'Content-Type: application/json' \
   -d '{
-        "millName": "Apex Textile Mills",
-        "contactName": "GM, Quality Assurance",
-        "email": "gm@apextextiles.com",
+        "millName": "Apex Spinning & Knitting Mills Ltd.",
+        "contactName": "Engr. Md. Rahim Ahmed",
+        "designation": "General Manager, QA",
+        "email": "rahim.qa@apextextiles.com",
         "phone": "+880 1700-000000",
-        "message": "Knits and woven, 60in rolls, ~40 rolls/day."
+        "location": "Gazipur, Dhaka, Bangladesh",
+        "factoryType": "Knit Fabric Mill",
+        "inspectionFramesCount": "2 - 5 Frames",
+        "fabricTypes": "Single Jersey, Interlock, Rib, Fleece",
+        "dailyProductionVolume": "25,000 yards/day",
+        "inspectionSpeed": "25 m/min",
+        "rollWidth": "72 inches",
+        "defectTypes": "Holes, Stains, Yarn breaks",
+        "erpIntegrationNeeded": "FastReact / SAP",
+        "targetTimeline": "1 - 3 Months",
+        "message": "Custom backlit table frame installation."
       }'
 ```
 

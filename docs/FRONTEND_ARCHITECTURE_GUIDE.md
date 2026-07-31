@@ -45,8 +45,9 @@ Everything in this repository flows in **one direction**:
                              │
                              ▼
   ┌─────────────────────────────────────────────────────────┐
-  │ 5. App Landing Page: app/page.tsx                       │
-  │    (Defines page section order & PageShell layout)       │
+  │ 5. App Routes & Pages: app/                            │
+  │    • app/page.tsx (Landing overview section order)     │
+  │    • app/deploy/page.tsx (Dedicated RMG Assessment)    │
   └──────────────────────────┘
 ```
 

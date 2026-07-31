@@ -38,24 +38,48 @@
 export interface DeploymentRequest {
   /** Mill or factory name. Required. */
   millName: string
-  /** Name / role of the person enquiring. Required. */
+  /** Name of the person enquiring. Required. */
   contactName: string
+  /** Designation / job title (e.g. Managing Director, Factory Manager). Optional. */
+  designation?: string
   /** Work email address. Required. */
   email: string
   /** Phone or WhatsApp number. Optional. */
-  phone: string
-  /** Free-text fabric specs and inspection requirements. Optional. */
-  message: string
+  phone?: string
+  /** Factory location (e.g. Gazipur, Dhaka, Bangladesh). Optional. */
+  location?: string
+  /** Type of factory (e.g. Knit Fabric Mill, Woven Mill, Denim). Optional. */
+  factoryType?: string
+  /** Number of inspection frames to upgrade/retrofit (e.g. 1-2, 3-5, 6+). Optional. */
+  inspectionFramesCount?: string
+  /** Fabric types handled (e.g. Single Jersey, Interlock, Rib, Denim). Optional. */
+  fabricTypes?: string
+  /** Daily/monthly production volume (e.g. 25,000 yards/day). Optional. */
+  dailyProductionVolume?: string
+  /** Target inspection speed (e.g. 25 m/min). Optional. */
+  inspectionSpeed?: string
+  /** Fabric roll or frame table width (e.g. 72 inches). Optional. */
+  rollWidth?: string
+  /** Primary defect focus areas (e.g. Holes, Stains, Slubs, Yarn breaks). Optional. */
+  defectTypes?: string
+  /** Target ERP or software integration (e.g. FastReact, SAP, Standalone). Optional. */
+  erpIntegrationNeeded?: string
+  /** Target implementation timeline (e.g. Immediate, 1-3 Months). Optional. */
+  targetTimeline?: string
+  /** Free-text fabric specs and technical inspection requirements. Optional. */
+  message?: string
 }
 
 /**
  * Result of a submission.
  *
- * A discriminated union rather than a thrown error: the form has to render an
- * inline message either way, and this makes the failure case impossible to
- * forget — TypeScript will not let you read `.error` without checking `ok`.
+ * A discriminated union carrying either `{ ok: true, referenceCode }` on success
+ * or `{ ok: false, error }` on failure. The form renders inline messages from
+ * this value, keeping the failure path explicit and type-safe.
  */
-export type SubmitResult = { ok: true } | { ok: false; error: string }
+export type SubmitResult =
+  | { ok: true; referenceCode?: string }
+  | { ok: false; error: string }
 
 /**
  * Shape of an error body from the API.
@@ -72,13 +96,11 @@ interface ProblemDetail {
 /**
  * Origin of the API — scheme and host only, no path.
  *
- * The value is normalised rather than trusted verbatim, because the two
- * mistakes people actually make when filling in a dashboard field are a
- * trailing slash and pasting the full endpoint. Both would otherwise produce a
- * 404 against `…//api/v1/…` or `…/api/v1/api/v1/…`.
+ * The value is normalised rather than trusted verbatim, because trailing slashes
+ * or embedded `/api/v1` prefixes would produce malformed URLs against `.../api/v1/...`.
  *
  * NOTE: `process.env.NEXT_PUBLIC_*` is inlined at build time, not read at
- * runtime. Changing it on Vercel therefore requires a redeploy, not a restart.
+ * runtime. Changing it on Vercel or Render requires a redeploy.
  */
 const API_BASE_URL: string = (() => {
   const raw = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
@@ -87,13 +109,11 @@ const API_BASE_URL: string = (() => {
 })()
 
 /**
- * Give up on a request that has not answered in this long.
+ * Request timeout window (60 seconds).
  *
- * 60s, not the 10-15s that would be normal, because the API is on Render's
- * free tier: an idle service is suspended and the next request pays for a full
- * JVM cold start, typically 30-50s. A shorter timeout would abort submissions
- * the backend went on to accept, and the visitor would see a failure for an
- * enquiry that was in fact recorded. See the note in `ContactSection.tsx`.
+ * Set to 60s because the backend running on Render free tier may require a JVM
+ * cold start (30-50s) after inactivity. A shorter client timeout would abort
+ * submissions that the server goes on to successfully process.
  */
 const REQUEST_TIMEOUT_MS = 60_000
 
@@ -101,21 +121,17 @@ const REQUEST_TIMEOUT_MS = 60_000
 const GENERIC_ERROR = 'Could not send your request. Please try again.'
 
 /**
- * Submits a deployment request to the backend.
+ * Submits an RMG Industry deployment assessment request to the Spring Boot backend.
  *
- * Never throws: every failure path — validation, server error, network loss,
- * timeout — is converted into `{ ok: false, error }` carrying a message that is
- * safe to show the visitor directly.
+ * Talks to `POST /api/v1/deployment-requests`. Never throws: converts network
+ * failures, timeouts, validation errors, and HTTP status codes into a safe
+ * `{ ok: false, error }` result object for direct UI rendering.
  *
- * @param request Form values. Whitespace is trimmed server-side and blank
- *                optional fields are normalised to null there, so the caller
- *                does not need to clean them up first.
+ * @param request Complete form values including mill specifications and contact details.
  */
 export async function submitDeploymentRequest(
   request: DeploymentRequest
 ): Promise<SubmitResult> {
-  // AbortSignal.timeout() would be neater but is unsupported in older Safari,
-  // which a mill's office machine is quite likely to be running.
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 
@@ -128,7 +144,8 @@ export async function submitDeploymentRequest(
     })
 
     if (response.ok) {
-      return { ok: true }
+      const data = await response.json().catch(() => ({}))
+      return { ok: true, referenceCode: data?.referenceCode }
     }
 
     return { ok: false, error: await readErrorMessage(response) }

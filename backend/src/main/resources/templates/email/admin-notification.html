@@ -160,6 +160,10 @@
           <td>{{contactName}}</td>
         </tr>
         <tr>
+          <td class="label">Designation / Role</td>
+          <td>{{designation}}</td>
+        </tr>
+        <tr>
           <td class="label">Direct Email</td>
           <td><a href="mailto:{{email}}" style="color: #0284c7;">{{email}}</a></td>
         </tr>
@@ -168,12 +172,52 @@
           <td>{{phone}}</td>
         </tr>
         <tr>
+          <td class="label">Location / Region</td>
+          <td>{{location}}</td>
+        </tr>
+        <tr>
           <td class="label">Submission Date</td>
           <td>{{submittedAt}}</td>
         </tr>
       </table>
 
-      <div class="section-title">Submitted Scope &amp; Technical Notes</div>
+      <div class="section-title">RMG &amp; Textile Mill Specifications</div>
+      <table class="info-grid">
+        <tr>
+          <td class="label">Factory Sector</td>
+          <td><strong>{{factoryType}}</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Inspection Frames Count</td>
+          <td>{{inspectionFramesCount}}</td>
+        </tr>
+        <tr>
+          <td class="label">Fabric Types Handled</td>
+          <td>{{fabricTypes}}</td>
+        </tr>
+        <tr>
+          <td class="label">Daily Production Volume</td>
+          <td>{{dailyProductionVolume}}</td>
+        </tr>
+        <tr>
+          <td class="label">Target Speed / Roll Width</td>
+          <td>{{inspectionSpeed}} &nbsp;|&nbsp; {{rollWidth}}</td>
+        </tr>
+        <tr>
+          <td class="label">Defect Focus Areas</td>
+          <td>{{defectTypes}}</td>
+        </tr>
+        <tr>
+          <td class="label">ERP System Integration</td>
+          <td>{{erpIntegrationNeeded}}</td>
+        </tr>
+        <tr>
+          <td class="label">Project Timeline</td>
+          <td>{{targetTimeline}}</td>
+        </tr>
+      </table>
+
+      <div class="section-title">Submitted Technical Notes &amp; Custom Requirements</div>
       <div class="message-box">
         {{message}}
       </div>

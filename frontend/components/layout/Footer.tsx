@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { ShieldCheck } from 'lucide-react'
 import { FOOTER_LINKS } from '@/lib/data/site'
 import { fabinsInnovators } from '@/lib/data/innovators'
@@ -60,17 +61,31 @@ export const Footer = () => {
               Navigate
             </h4>
             <ul className="mt-5 space-y-3 text-sm">
-              {FOOTER_LINKS.map((link) => (
-                <li key={link.id}>
-                  <a
-                    href={`#${link.id}`}
-                    onClick={(event) => handleNavigate(event, link.id)}
-                    className="text-ink-muted transition-colors hover:text-accent"
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link href="/#about" className="text-ink-muted transition-colors hover:text-accent">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/#system" className="text-ink-muted transition-colors hover:text-accent">
+                  System
+                </Link>
+              </li>
+              <li>
+                <Link href="/#standards" className="text-ink-muted transition-colors hover:text-accent">
+                  Standards
+                </Link>
+              </li>
+              <li>
+                <Link href="/#innovators" className="text-ink-muted transition-colors hover:text-accent">
+                  Innovators
+                </Link>
+              </li>
+              <li>
+                <Link href="/deploy" className="text-accent font-semibold transition-colors hover:underline">
+                  Deploy FABINS →
+                </Link>
+              </li>
             </ul>
           </div>
 

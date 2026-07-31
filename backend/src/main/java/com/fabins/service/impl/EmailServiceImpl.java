@@ -167,15 +167,26 @@ public class EmailServiceImpl implements EmailService {
         ApiProperties.Mail mail = properties.mail();
         String reference = request.getReferenceCode();
 
-        String body = render(TEMPLATE_ADMIN_NOTIFICATION, Map.of(
-                "acknowledgeUrl", acknowledgeUrl(request),
-                "requestId", reference,
-                "millName", request.getMillName(),
-                "contactName", request.getContactName(),
-                "email", request.getEmail(),
-                "phone", Objects.requireNonNullElse(request.getPhone(), "N/A"),
-                "submittedAt", String.valueOf(request.getSubmittedAt()),
-                "message", Objects.requireNonNullElse(request.getMessage(), "None provided")
+        String body = render(TEMPLATE_ADMIN_NOTIFICATION, Map.ofEntries(
+                Map.entry("acknowledgeUrl", acknowledgeUrl(request)),
+                Map.entry("requestId", reference),
+                Map.entry("millName", request.getMillName()),
+                Map.entry("contactName", request.getContactName()),
+                Map.entry("designation", Objects.requireNonNullElse(request.getDesignation(), "N/A")),
+                Map.entry("email", request.getEmail()),
+                Map.entry("phone", Objects.requireNonNullElse(request.getPhone(), "N/A")),
+                Map.entry("location", Objects.requireNonNullElse(request.getLocation(), "N/A")),
+                Map.entry("factoryType", Objects.requireNonNullElse(request.getFactoryType(), "N/A")),
+                Map.entry("inspectionFramesCount", Objects.requireNonNullElse(request.getInspectionFramesCount(), "N/A")),
+                Map.entry("fabricTypes", Objects.requireNonNullElse(request.getFabricTypes(), "N/A")),
+                Map.entry("dailyProductionVolume", Objects.requireNonNullElse(request.getDailyProductionVolume(), "N/A")),
+                Map.entry("inspectionSpeed", Objects.requireNonNullElse(request.getInspectionSpeed(), "N/A")),
+                Map.entry("rollWidth", Objects.requireNonNullElse(request.getRollWidth(), "N/A")),
+                Map.entry("defectTypes", Objects.requireNonNullElse(request.getDefectTypes(), "N/A")),
+                Map.entry("erpIntegrationNeeded", Objects.requireNonNullElse(request.getErpIntegrationNeeded(), "N/A")),
+                Map.entry("targetTimeline", Objects.requireNonNullElse(request.getTargetTimeline(), "N/A")),
+                Map.entry("submittedAt", String.valueOf(request.getSubmittedAt())),
+                Map.entry("message", Objects.requireNonNullElse(request.getMessage(), "None provided"))
         ));
 
         dispatch(mail.adminAddress(),
