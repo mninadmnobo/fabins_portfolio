@@ -299,7 +299,7 @@ export default function DeployPage() {
                     <Zap className="h-5 w-5 text-accent shrink-0" />
                     <div>
                       <strong className="block text-ink font-semibold">Technical Follow-up</strong>
-                      Our lead R&amp;D engineer will contact you within 24-48 hours.
+                      Our engineers will contact you within 24-48 hours.
                     </div>
                   </div>
                 </div>
